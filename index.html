@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+        <meta name="author" content="Peter Steinbach" />
+            <title>Preventing Errors</title>
+    <meta name="description" content="Preventing Errors">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Bootstrap core CSS -->
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="my_reveal.css"/>
+        <link rel="stylesheet" href="reveal.js/css/theme/black.css" id="theme">
+    
+        <link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+    
+    <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+    <script>
+      if( window.location.search.match( /print-pdf/gi ) ) {
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = 'reveal.js/css/print/pdf.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+      }
+    </script>
+    <!--[if lt IE 9]>
+	<script src="reveal.js/lib/js/html5shiv.js"></script>
+	<![endif]-->
+          </head>
+  <body>
+        <div class="reveal">
+      <div class="slides">
+
+		<section>
+	  <h1 class="title">Preventing Errors</h1>
+	  	  <p>
+	    <b>Peter Steinbach</b><br>
+	    <emph>(Max Planck Institute of Molecular Cell Biology and Genetics, Dresden)</emph><br>
+	    <a href="mailto:steinbac@mpi-cbg.de">steinbac@mpi-cbg.de</a>
+	    <br><br>
+	  </p>
+	  
+	  <h3 class="date">November 7 , 2016</h3>
+	</section>
+		
+	<section><section id="error-free-programming-or-error-prevention" class="titleslide slide level1"><h1>Error Free Programming or Error Prevention?</h1></section><section id="the-holy-grail" class="slide level2">
+<h1>The Holy Grail</h1>
+<pre><code>int i = 1;</code></pre>
+<div class="fragment">
+<center>
+<strong>any more code might introduce errors!</strong>
+</center>
+</div>
+</section><section id="motivation" class="slide level2">
+<h1>Motivation</h1>
+<center>
+<img src="img/heise_artikel.png" /><br />by Joachim Hofer, software architect at Zalando
+</center>
+</section><section id="outline" class="slide level2">
+<h1>Outline</h1>
+<div style="font-size : 1.5em">
+<center>
+<ol type="1">
+<li><p>Code Context</p></li>
+<li><p>Good Code prevents Errors</p></li>
+<li><p>Redundat Code</p></li>
+<li>Dynamic State</li>
+</ol>
+</center>
+</div>
+</section></section>
+<section><section id="code-context" class="titleslide slide level1"><h1>Code Context</h1></section><section id="cognitive-load" class="slide level2">
+<h1>Cognitive Load</h1>
+<div style="font-size : 5em">
+<center>
+<strong>7 +/- 2</strong>
+</center>
+</div>
+<center>
+(George A. Miller; The magical number seven plus or minus two; Some limits on our capacity for processing informations; Psychological Review 63 8 (1956), S. 81–97)
+</center>
+</section><section id="a-scientific-programmer-changing-code" class="slide level2">
+<h1>A (Scientific) Programmer changing code</h1>
+</section><section id="code-workload" class="slide level2">
+<h1>code workload</h1>
+<ul>
+<li>where to apply change</li>
+<li>change propagation (dependencies)</li>
+<li>requirements to consider when applying a change</li>
+</ul>
+<center>
+<img src="img/Cpp_in_GNU_emacs.png" />
+</center>
+</section><section id="desktop-workload" class="slide level2">
+<h1>desktop workload</h1>
+<ul>
+<li>answering emails</li>
+<li>answering walk-in requests<br /></li>
+<li>pressure of deliverables</li>
+</ul>
+<center>
+<img src="img/640px-Employees_discuss_in_office.jpg" />
+</center>
+</section><section id="editor-workload" class="slide level2">
+<h1>editor workload</h1>
+<ul>
+<li>keyboard short-cuts, menue structure</li>
+<li>syntax to use (programming language, programming paradigms)</li>
+<li>library semantics and API</li>
+</ul>
+<center>
+<img src="img/Uml_diagram2.png" />
+</center>
+</section><section id="scientific-workload" class="slide level2">
+<h1>scientific workload</h1>
+<ul>
+<li>academic context (time and hierarchy pressure)</li>
+<li>scientific context (what problem do I wanna solve?)</li>
+</ul>
+<center>
+<img src="img/Interpolation-bicubic.svg.png" />
+</center>
+</section><section id="a-scientific-programmer-changing-code-..." class="slide level2">
+<h1>A (Scientific) Programmer changing code ...</h1>
+<div style="font-size : 3em">
+<center>
+is almost always crossing the <em>7 +/- 2</em> barrier.
+</center>
+</div>
+</section><section id="possible-solutions" class="slide level2">
+<h1>Possible Solutions</h1>
+<ul>
+<li>manage your time (e.g. Pomodoro, Getting-Things-Done)</li>
+</ul>
+<div class="fragment">
+<ul>
+<li><p>keep your head free to solve the problem</p>
+<ul>
+<li><p>no extensive working hours</p></li>
+<li><p>use leisure to relax (not to work)</p></li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li><p>Test-Driven Development (TDD)</p>
+<ol type="1">
+<li>write failing test for feature (red)</li>
+<li>add implmenentation and make test pass (green)</li>
+<li>Refactor to achieve good design while all tests pass (refactor)</li>
+<li>return to 1.</li>
+</ol></li>
+</ul>
+</div>
+</section></section>
+<section><section id="good-code-prevents-errors" class="titleslide slide level1"><h1>Good Code prevents Errors</h1></section><section id="clean-code-movement" class="slide level2">
+<h1>Clean Code Movement</h1>
+<center>
+<img src="img/clean_code_resized.png" />
+</center>
+<p>Robert C. Martin, &quot;Clean Code: A Handbook of Agile Software Craftsmanship&quot;, 2008, Prentice Hall</p>
+</section><section id="write-readable-code" class="slide level2">
+<h1>Write Readable Code</h1>
+<ul>
+<li>naming a variables/class/function in a readable fashion, improves system design</li>
+<li>requires exercise and discipline</li>
+<li><em>can't find a good name?</em></li>
+</ul>
+<div class="fragment">
+<p><strong>Maybe your mental model is defective or not complete!</strong></p>
+</div>
+<div class="fragment">
+<ul>
+<li><em>can't change the variable/function/class name in a project easily?</em></li>
+</ul>
+</div>
+<div class="fragment">
+<p><strong>Maybe your editor is not supporting you enough!</strong></p>
+</div>
+</section><section id="type-systems-are-your-friend" class="slide level2">
+<h1>Type Systems are your friend</h1>
+<ul>
+<li>helps compiler to find bugs before they happen</li>
+<li>may induce boiler plate code (i.e. code necessary for the compiler only)</li>
+<li>good type system helps to construct application logic with domain-specific types so that unrequired states lead to compiler errors</li>
+<li>example: special case handling with null references</li>
+</ul>
+</section><section id="newsletter-example" class="slide level2">
+<h1>Newsletter example</h1>
+<pre><code>case class Person(name: String, email: String)
+
+trait Newsletter {
+
+  val persons: List[Person]
+
+  def sendNewsletterTo(email: String): Unit
+
+  def sendNewsletter: Unit = {
+
+    for (person &lt;- persons)
+      if (person.email != null) //please remember this!
+        sendNewsletterTo(person.email)
+  }
+}
+</code></pre>
+</section><section id="newsletter-discussion" class="slide level2">
+<h1>Newsletter discussion</h1>
+<ul>
+<li><p>simple example, check for <code>null</code> is hard to forget</p></li>
+<li><p>in complex real scenario, <code>null</code> check can be forgotten easily</p>
+<ul>
+<li>defensive profgramming: check state everywhere (if-elseif-else madness)</li>
+<li>problem: code becomes unreadable</li>
+</ul></li>
+<li><p>alternatives:</p>
+<ul>
+<li>use optional data types (yields None and StringType as sub types)</li>
+<li>subclassing: Person class with email, Person class without email</li>
+</ul></li>
+</ul>
+</section><section id="newsletter-solution" class="slide level2">
+<h1>Newsletter solution</h1>
+<pre><code>case class Person(name: String, email: Option[String])
+
+trait Newsletter {
+
+  val persons: List[Person]
+
+  def sendNewsletterTo(email: String): Unit
+
+  def sendNewsletter: Unit = {
+
+    for (person &lt;- persons)
+      person.email foreach sendNewsletterTo 
+  }
+}</code></pre>
+</section></section>
+<section><section id="redundant-code" class="titleslide slide level1"><h1>Redundant code</h1></section><section id="copy-paste" class="slide level2">
+<h1>Copy &amp; Paste</h1>
+<ul>
+<li>easy and quick fix</li>
+<li>a lot of technical debt accumulated</li>
+<li><p>future change: has to be propagated to many places</p></li>
+<li><p><strong>don't copy&amp;paste, but abstract</strong></p>
+<ul>
+<li>minor changes should induce new functions/subclasses</li>
+<li>in practice often doable but hard</li>
+</ul></li>
+</ul>
+</section><section id="copy-paste-example-1" class="slide level2">
+<h1>Copy &amp; Paste, Example 1</h1>
+<pre><code>def getNumPersons(query: PreparedStatement): Long = {
+  val results = query.executeQuery
+  try {
+    results.next
+    return results.getLong(&quot;numPersons&quot;)
+  } finally {
+    results.close
+  }
+}</code></pre>
+</section><section id="copy-paste-example-2" class="slide level2">
+<h1>Copy &amp; Paste, Example 2</h1>
+<pre><code>def getNumPersonsNamed(
+
+    name: String, query: PreparedStatement): Int = {
+  query.setString(1, name)
+  val results = query.executeQuery
+  try {
+    results.next
+    return results.getInt(&quot;numNamedPersons&quot;)
+  } finally {
+    results.close
+  }
+}</code></pre>
+</section><section id="copy-paste-solution" class="slide level2">
+<h1>Copy &amp; Paste, Solution</h1>
+<ul>
+<li>Template Method Pattern (GoF Pattern, class architecture for query)</li>
+<li>Higher-Order Functions using lamdas (functional approach)</li>
+</ul>
+<p><strong>preventing copy&amp;paste is doable!</strong></p>
+</section></section>
+<section><section id="dynamic-state" class="titleslide slide level1"><h1>Dynamic State</h1></section><section id="state" class="slide level2">
+<h1>State</h1>
+<ul>
+<li><p>state base programming from a time, where state was mapped to memory (due to memory being scarce)</p></li>
+<li><p>today: memory not a problem, topics like parallelisation are important</p></li>
+<li><p>dynamic state induces complexity, complexity is hard to test (compare bigger/normal classes to functions)</p></li>
+</ul>
+<p><strong>Avoid state whereever possible!</strong></p>
+</section><section id="state-in-real-life" class="slide level2">
+<h1>State in Real Life</h1>
+<ul>
+<li><p>state required in many cases</p>
+<ul>
+<li>i/o</li>
+<li>events from a GUI</li>
+<li>data base access</li>
+</ul></li>
+<li><p>new trends emerge:</p>
+<ul>
+<li>reactive programming</li>
+<li>data bases with event based records (journal of data changes is kept)</li>
+<li>persistent data structures (system knows changes to data, always trackable, e.g. Spark)</li>
+</ul></li>
+</ul>
+</section></section>
+<section><section id="summary" class="titleslide slide level1"><h1>Summary</h1></section><section id="summary-1" class="slide level2">
+<h1>Summary</h1>
+<ul>
+<li><p>software development is a cognitive demanding activity</p></li>
+<li><p>techniques exist to reduce complexity in-code, out-of-code</p></li>
+<li><p>by reducing complexity, ease cognitive load</p></li>
+<li><p>less cognitive load, less errors</p></li>
+</ul>
+<div class="fragment">
+<p>Thank you for your attention!</p>
+</div>
+</section></section>
+      </div>
+    </div>
+
+
+    <script src="reveal.js/lib/js/head.min.js"></script>
+    <script src="reveal.js/js/reveal.js"></script>
+
+    <script>
+
+      // Full list of configuration options available here:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+      controls: false,
+      progress: true,
+      history: true,
+      center: true,
+      
+      slideNumber: true,
+      // The "normal" size of the presentation, aspect ratio will be preserved
+      // when the presentation is scaled to fit different resolutions. Can be
+      // specified using percentage units.
+      width: '1600',
+      height: 1080,
+
+      // Factor of the display size that should remain empty around the content
+      margin: 0.01,
+
+      // Bounds for smallest/largest possible scale to apply to content
+      minScale: 0.2,
+      maxScale: 1.5,
+
+      theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+      transition: 'slide', // default/cube/page/concave/zoom/linear/fade/none
+
+      // Optional libraries used to extend on reveal.js
+      dependencies: [
+      { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+            { src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+            { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+      { src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+      //          { src: 'reveal.js/plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; }, }
+      //          { src: 'reveal.js/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+      ]});
+    </script>
+      </body>
+</html>
