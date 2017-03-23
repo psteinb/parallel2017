@@ -14,3 +14,6 @@ all : $(SVG_FILES) $(PDF_FILES)
 
 clean:
 	rm -rf *aux *log *svg *pdf
+
+help:
+	@echo "images require latex (tikz, pgf, smartdiagram), pdflatex, pdf2svg to be available"
