@@ -355,7 +355,86 @@ void HCStream&lt;T&gt;::add()
                                 , [=](hc::index&lt;1&gt; i) [[hc]] {
                                   view_c[i] = view_a[i]+view_b[i];
                                 });</code></pre>
+</section><section id="lets-compare" class="slide level2">
+<h1>Let's compare</h1>
+<p><plot comparing memory bandwidth of opencl, hip and hc></p>
+</section><section id="that-doesnt-mean-its-easy" class="slide level2">
+<h1>That doesn't mean it's easy</h1>
+<pre><code>  hc::completion_future dot_kernel = hc::parallel_for_each(tiled_ex,
+    [=](hc::tiled_index&lt;1&gt; tidx) [[hc]] {
+
+      std::size_t tid = tidx.local[0];//index in the tile
+
+      tile_static T tileData[TBSIZE];
+
+      std::size_t i = (tidx.tile[0] * 2 * TBSIZE) + tid;
+      std::size_t stride = TBSIZE * 2 * n_tiles;
+
+      //  Load and add many elements, rather than just two
+      T sum = 0;
+      do
+      {
+        T near = view_a[i]*view_b[i];
+        T far = view_a[i+TBSIZE]*view_b[i+TBSIZE];
+        sum += (far + near);
+        i += stride;
+      }
+      while (i &lt; n_elements);
+      tileData[tid] = sum;
+
+      tidx.barrier.wait();
+
+      //  Reduce values for data on this tile
+      for (stride = (TBSIZE / 2); stride &gt; 0; stride &gt;&gt;= 1)
+      {
+        //  Remember that this is a branch within a loop and all threads will have to execute
+        //  this but only threads with a tid &lt; stride will do useful work.
+        if (tid &lt; stride)
+          tileData[tid] += tileData[tid + stride];
+
+        tidx.barrier.wait_with_tile_static_memory_fence();
+      }
+
+      //  Write the result for this tile back to global memory
+      if (tid == 0)
+        partialv[tidx.tile[0]] = tileData[tid];
+    });</code></pre>
+</section><section id="concurrency-to-the-rescue" class="slide level2">
+<h1>Concurrency to the rescue!</h1>
+<p>Feature preview of Concurrency TS in a host-device setting.</p>
+</section><section id="concurrency-continued" class="slide level2">
+<h1>Concurrency continued</h1>
+</section><section id="concurrency-profile" class="slide level2">
+<h1>Concurrency profile</h1>
 </section></section>
+<section><section id="summary" class="titleslide slide level1"><h1>Summary</h1></section><section id="what-i1-learned-so-far" class="slide level2">
+<h1>What I<a href="#/fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> learned so far</h1>
+<ul>
+<li>AMD's ROCm/ROCr stack is a very young and ambitious project</li>
+<li>full open-source driver, runtime and compiler for dGPU</li>
+<li><code>hc</code> based on C++AMP includes C++17 or C++20 features for GPU computing</li>
+<li><code>hc</code> API is expressive and reduces boiler-plate code</li>
+</ul>
+<center>
+<pre><code>**Thank you for your attention!**</code></pre>
+</center>
+</section></section>
+<section class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>with feedback by <script type="text/javascript">
+<!--
+h='&#x61;&#x6d;&#100;&#46;&#x63;&#x6f;&#x6d;';a='&#64;';n='&#98;&#x65;&#110;&#46;&#x73;&#x61;&#110;&#100;&#x65;&#114;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'&#66;&#x65;&#110;&#32;&#x53;&#x61;&#110;&#100;&#x65;&#114;'+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#66;&#x65;&#110;&#32;&#x53;&#x61;&#110;&#100;&#x65;&#114;&#32;&#40;&#98;&#x65;&#110;&#46;&#x73;&#x61;&#110;&#100;&#x65;&#114;&#32;&#x61;&#116;&#32;&#x61;&#x6d;&#100;&#32;&#100;&#x6f;&#116;&#32;&#x63;&#x6f;&#x6d;&#x29;</noscript> and <script type="text/javascript">
+<!--
+h='&#x61;&#x6d;&#100;&#46;&#x63;&#x6f;&#x6d;';a='&#64;';n='&#x41;&#108;&#x65;&#120;&#x61;&#110;&#100;&#114;&#x75;&#46;&#86;&#x6f;&#x69;&#x63;&#x75;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'&#x41;&#108;&#x65;&#120;&#32;&#86;&#x6f;&#x69;&#x63;&#x75;'+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#x41;&#108;&#x65;&#120;&#32;&#86;&#x6f;&#x69;&#x63;&#x75;&#32;&#40;&#x41;&#108;&#x65;&#120;&#x61;&#110;&#100;&#114;&#x75;&#46;&#86;&#x6f;&#x69;&#x63;&#x75;&#32;&#x61;&#116;&#32;&#x61;&#x6d;&#100;&#32;&#100;&#x6f;&#116;&#32;&#x63;&#x6f;&#x6d;&#x29;</noscript><a href="#/fnref1">↩</a></p></li>
+</ol>
+</section>
       </div>
     </div>
 

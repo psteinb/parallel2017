@@ -473,4 +473,26 @@ void HCStream<T>::add()
 
 ## Concurrency to the rescue!
 
+Feature preview of Concurrency TS in a host-device setting.
 
+
+## Concurrency continued
+
+
+## Concurrency profile
+
+
+# Summary
+
+## What I[^1] learned so far
+
+- AMD's ROCm/ROCr stack is a very young and ambitious project
+- full open-source driver, runtime and compiler for dGPU
+- `hc` based on C++AMP includes C++17 or C++20 features for GPU computing
+- `hc` API is expressive and reduces boiler-plate code
+
+<center>
+    **Thank you for your attention!**
+</center>
+
+[^1]: with feedback by [Ben Sander](mailto:ben.sander@amd.com) and [Alex Voicu](mailto:Alexandru.Voicu@amd.com)
