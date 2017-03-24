@@ -73,13 +73,13 @@
 <div class="col-xs-4">
 <center>
 Nvidia Tesla<br />
-<img src="img/Nvidia-Tesla-K80_x400.jpg" />
+<img src="img/nvidia_tesla_p100_cropped_x400.png" />
 </center>
 </div>
 <div class="col-xs-4">
 <center>
 AMD FirePro<br />
-<img src="img/amd-firepro-s9150-server-graphics_x400.png" />
+<img src="img/FirePro_S9300x2_x400.png" />
 </center>
 </div>
 <div class="col-xs-4">
@@ -105,14 +105,197 @@ Movie does not work! Sorry!
 <p><em>Accelerating <a href="http://www.nature.com/nmeth/journal/v11/n6/full/nmeth.2929.html">our clients' scientific algorithms</a> on <a href="https://github.com/psteinb/gtc2015.git">GPUs</a><br />
 (multi-GB dataset, a lot of FFTs)</em></p>
 </center>
-</section><section id="this-talk-is-open-source" class="slide level2">
-<h1>This Talk is Open-Source!</h1>
+</section><section id="this-talk-advertisement" class="slide level2">
+<h1>This Talk != Advertisement</h1>
+<center>
+<strong>AMD provided test hardware and that's it!</strong>
+</center>
+<ul>
+<li><p>Our company is by no means financially tied to AMD nor any of it's resellers.</p></li>
+<li><p>whatever I find missing or not working, I'll report it here (use the <a href="https://github.com/psteinb/parallel2017/issues">issue tracker</a> of this talk to correct me)</p></li>
+</ul>
+</section><section id="this-talk-is" class="slide level2">
+<h1>This Talk is</h1>
 <center>
 <figure>
 <img src="img/opensource-550x475.png" />
 </figure>
 <strong><a href="https://github.com/psteinb/parallel2017">github.com/psteinb/parallel2017</a></strong>
 </center>
+</section><section id="outline" class="slide level2">
+<h1>Outline</h1>
+<div style="font-size : 1.5em">
+<center>
+<ol type="1">
+<li><p>ROCm</p></li>
+<li><p>Porting Code from CUDA</p></li>
+<li>HC</li>
+</ol>
+</center>
+</div>
+</section></section>
+<section><section id="rocm" class="titleslide slide level1"><h1>ROCm</h1></section><section id="radeon-open-compute-platform" class="slide level2">
+<h1>Radeon Open Compute Platform</h1>
+<div class="row">
+<div class="col-xs-4">
+<p><a href="http://gpuopen.com/compute-product/rocm/"><img src="img/rocm_logo_x400.png" /></a></p>
+</div>
+<div class="col-xs-8">
+</div>
+<ul>
+<li>very young:<br />
+<em>April 25th, 2016</em>, version 1.0</li>
+<li><p>3 main components:</p>
+<ul>
+<li><a href="http://gpuopen.com/compute-product/rocm/">ROCm</a> Linux kernel driver</li>
+<li><a href="https://github.com/RadeonOpenCompute/ROCR-Runtime">ROCr</a> runtime &amp; library stack</li>
+<li><a href="https://github.com/RadeonOpenCompute/hcc">HCC</a> compiler based on LLVM</li>
+</ul></li>
+</ul>
+<center>
+<strong>Open Source!</strong>
+</center>
+</div>
+</section><section id="rocm-kernel-driver" class="slide level2">
+<h1>ROCm kernel driver</h1>
+<div class="row">
+<div class="col-xs-4">
+<p><a href="http://www.amd.com/en-us/innovations/software-technologies/gcn"><img src="img/amd-gcn-2.0-hawaii_x400.png" /></a></p>
+</div>
+<div class="col-xs-8">
+</div>
+<center>
+<ul>
+<li>large memory single allocation<br />
+(&gt;32GB in one pointer)</li>
+<li>peer-to-peer Multi-GPU</li>
+<li>peer-to-peer with RDMA</li>
+<li>systems management API and tooling</li>
+</ul>
+</center>
+</div>
+</section><section id="rocr-runtime" class="slide level2">
+<h1>ROCr runtime</h1>
+<div class="row-fluid">
+<div class="col-xs-4">
+<center>
+<a href="http://www.hsafoundation.com/"><img src="img/hsa_logo_x400.jpg" /></a>
+</center>
+</div>
+<div class="col-xs-8">
+</div>
+<ul>
+<li>AMD's implementation of HSA runtime<br />
+(+ extensions for multi-GPU)</li>
+<li>user mode queues</li>
+<li>flat memory addressing</li>
+<li>atomic memory transactions &amp; signals</li>
+<li>process concurrency &amp; preemption</li>
+<li>device discovery</li>
+</ul>
+</div>
+</section><section id="heterogenous-compute-compiler" class="slide level2">
+<h1>Heterogenous Compute Compiler</h1>
+<div class="row">
+<div class="col-xs-4">
+<center>
+<a href="http://www.hsafoundation.com/"><img src="img/llvm-dragon_x400.png" /></a>
+</center>
+</div>
+<div class="col-xs-8">
+</div>
+<ul>
+<li><a href="https://github.com/RadeonOpenCompute/hcc">hcc</a> compiler for supported APIs</li>
+<li>LLVM native GCN ISA code generation</li>
+<li>offline compilation support</li>
+<li>standardized loader and code object format</li>
+<li>GCN ISA assembler and disassembler</li>
+<li>HIP, HC and OpenCL programming interface</li>
+</ul>
+</div>
+</section></section>
+<section><section id="porting-code-from-cuda" class="titleslide slide level1"><h1>Porting Code from CUDA</h1></section><section id="prologue" class="slide level2">
+<h1>Prologue</h1>
+<center>
+<figure>
+<img src="img/github_gpu_stream.png" alt="UoB-HPC/GPU-STREAM" style="width:90.0%" /><figcaption><a href="https://github.com/UoB-HPC/GPU-STREAM">UoB-HPC/GPU-STREAM</a></figcaption>
+</figure>
+</center>
+</section><section id="uob-hpcgpu-stream" class="slide level2">
+<h1><a href="https://github.com/UoB-HPC/GPU-STREAM">UoB-HPC/GPU-STREAM</a></h1>
+<pre><code>/* add   */ c[:]    = a[:]
+/* mul   */ b[:]    = scalar*b[:]
+/* copy  */ c[:]    = a[:] + b[:]
+/* triad */ a[:]    = b[:] + scalar*c[:] 
+/* dot   */ scalar  = dot(a[:],b[:])</code></pre>
+<center>
+<ul>
+<li>benchmark of various programming paradigms:<br />
+OpenMP3, OpenMP4, CUDA, Kokkos, Raja, OpenCL, ...</li>
+<li>for now *nix only</li>
+</ul>
+</center>
+</section><section id="hipify" class="slide level2">
+<h1>Hipify</h1>
+<div  class="row">
+<div class="col-xs-4">
+<center>
+<figure>
+<img src="fig/hipify-pipeline.svg" style="width:65.0%" />
+</figure>
+</center>
+</div>
+<div class="col-xs-8">
+<ul>
+<li>Convert CUDA to portable C++</li>
+<li>C++ kernel language ( C++11/14/17 features )</li>
+<li>C runtime API</li>
+<li>same performance as native CUDA</li>
+</ul>
+<div class="fragment">
+<p> </p>
+<ul>
+<li><p>supports <em>most commonly</em> used parts of CUDA:<br />
+streams, events, memory (de-)allocation, profiling</p></li>
+<li>produced apps have full tool support:
+<ul>
+<li>CUDA: nvcc, nvprof, ...</li>
+<li>ROCM: hcc, rocm-prof, codexl</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</section><section id="cuda-example" class="slide level2">
+<h1>CUDA Example</h1>
+<pre><code>__global__ void add_kernel(const T * a, 
+                           const T * b, 
+                           T * c){
+  const int i = blockDim.x * blockIdx.x + threadIdx.x;
+  c[i] = a[i] + b[i];}
+
+void CUDAStream&lt;T&gt;::add(){
+  add_kernel&lt;&lt;&lt;array_size/TBSIZE, TBSIZE&gt;&gt;&gt;(d_a, d_b, d_c);
+  check_error();
+  //..
+  }</code></pre>
+</section><section id="hipified-example" class="slide level2">
+<h1>Hipified Example</h1>
+<pre><code>__global__ void add_kernel(hipLaunchParm lp, 
+                           const T * a, 
+                           const T * b, 
+                           T * c){
+  const int i = hipBlockDim_x * hipBlockIdx_x + hipThreadIdx_x;
+  c[i] = a[i] + b[i];
+}
+
+void HIPStream&lt;T&gt;::add(){
+  hipLaunchKernel(HIP_KERNEL_NAME(add_kernel), 
+                  dim3(array_size/TBSIZE), dim3(TBSIZE), 0, 0, 
+                  d_a, d_b, d_c);
+  check_error();
+  //...
+}</code></pre>
 </section></section>
       </div>
     </div>
@@ -135,7 +318,7 @@ Movie does not work! Sorry!
       // The "normal" size of the presentation, aspect ratio will be preserved
       // when the presentation is scaled to fit different resolutions. Can be
       // specified using percentage units.
-      width: '1600',
+      width: 1920,
       height: 1080,
 
       // Factor of the display size that should remain empty around the content
