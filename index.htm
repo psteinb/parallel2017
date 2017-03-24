@@ -316,6 +316,45 @@ void HIPStream&lt;T&gt;::add(){
 <center>
 <img src="fig/hc_api_nutshell.svg" style="width:80.0%" />
 </center>
+</section><section id="hc-in-gpu-stream-declaration" class="slide level2">
+<h1>HC in <a href="https://github.com/UoB-HPC/GPU-STREAM">GPU-STREAM</a>, Declaration</h1>
+<pre><code>#include &quot;Stream.h&quot;
+#include &quot;hc.hpp&quot;
+
+template &lt;class T&gt;
+class HCStream : public Stream&lt;T&gt;
+{
+protected:
+  // Size of arrays
+  unsigned int array_size;
+  // Device side pointers to arrays
+  hc::array&lt;T,1&gt; d_a;
+  hc::array&lt;T,1&gt; d_b;
+  hc::array&lt;T,1&gt; d_c;</code></pre>
+</section><section id="hc-in-gpu-stream-initialization" class="slide level2">
+<h1>HC in <a href="https://github.com/UoB-HPC/GPU-STREAM">GPU-STREAM</a>, Initialization</h1>
+<pre><code>template &lt;class T&gt;
+void HCStream&lt;T&gt;::init_arrays(T _a, T _b, T _c)
+{
+    hc::array_view&lt;T,1&gt; view_a(this-&gt;d_a);
+    hc::parallel_for_each(hc::extent&lt;1&gt;(array_size)
+                                , [=](hc::index&lt;1&gt; i) [[hc]] {
+                                  view_a[i] = _a;
+                                });
+    //...</code></pre>
+</section><section id="hc-in-gpu-stream-run-kernel" class="slide level2">
+<h1>HC in <a href="https://github.com/UoB-HPC/GPU-STREAM">GPU-STREAM</a>, Run Kernel</h1>
+<pre><code>template &lt;class T&gt;
+void HCStream&lt;T&gt;::add()
+{
+    hc::array_view&lt;T,1&gt; view_a(this-&gt;d_a);
+    hc::array_view&lt;T,1&gt; view_b(this-&gt;d_b);
+    hc::array_view&lt;T,1&gt; view_c(this-&gt;d_c);
+
+    hc::parallel_for_each(hc::extent&lt;1&gt;(array_size)
+                                , [=](hc::index&lt;1&gt; i) [[hc]] {
+                                  view_c[i] = view_a[i]+view_b[i];
+                                });</code></pre>
 </section></section>
       </div>
     </div>

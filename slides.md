@@ -374,3 +374,103 @@ void HIPStream<T>::add(){
 <center>
 ![](fig/hc_api_nutshell.svg){ width=80% }
 </center>
+
+## HC in [GPU-STREAM](https://github.com/UoB-HPC/GPU-STREAM), Declaration
+
+```
+#include "Stream.h"
+#include "hc.hpp"
+
+template <class T>
+class HCStream : public Stream<T>
+{
+protected:
+  // Size of arrays
+  unsigned int array_size;
+  // Device side pointers to arrays
+  hc::array<T,1> d_a;
+  hc::array<T,1> d_b;
+  hc::array<T,1> d_c;
+```
+
+## HC in [GPU-STREAM](https://github.com/UoB-HPC/GPU-STREAM), Initialization
+
+```
+template <class T>
+void HCStream<T>::init_arrays(T _a, T _b, T _c)
+{
+    hc::array_view<T,1> view_a(this->d_a);
+    hc::parallel_for_each(hc::extent<1>(array_size)
+                                , [=](hc::index<1> i) [[hc]] {
+                                  view_a[i] = _a;
+                                });
+    //...
+```
+
+## HC in [GPU-STREAM](https://github.com/UoB-HPC/GPU-STREAM), Run Kernel
+
+```
+template <class T>
+void HCStream<T>::add()
+{
+    hc::array_view<T,1> view_a(this->d_a);
+    hc::array_view<T,1> view_b(this->d_b);
+    hc::array_view<T,1> view_c(this->d_c);
+
+    hc::parallel_for_each(hc::extent<1>(array_size)
+                                , [=](hc::index<1> i) [[hc]] {
+                                  view_c[i] = view_a[i]+view_b[i];
+								});
+```
+
+## Let's compare
+
+<plot comparing memory bandwidth of opencl, hip and hc>
+
+## That doesn't mean it's easy
+
+```
+  hc::completion_future dot_kernel = hc::parallel_for_each(tiled_ex,
+    [=](hc::tiled_index<1> tidx) [[hc]] {
+
+      std::size_t tid = tidx.local[0];//index in the tile
+
+      tile_static T tileData[TBSIZE];
+
+      std::size_t i = (tidx.tile[0] * 2 * TBSIZE) + tid;
+      std::size_t stride = TBSIZE * 2 * n_tiles;
+
+      //  Load and add many elements, rather than just two
+      T sum = 0;
+      do
+      {
+        T near = view_a[i]*view_b[i];
+        T far = view_a[i+TBSIZE]*view_b[i+TBSIZE];
+        sum += (far + near);
+        i += stride;
+      }
+      while (i < n_elements);
+      tileData[tid] = sum;
+
+      tidx.barrier.wait();
+
+      //  Reduce values for data on this tile
+      for (stride = (TBSIZE / 2); stride > 0; stride >>= 1)
+      {
+        //  Remember that this is a branch within a loop and all threads will have to execute
+        //  this but only threads with a tid < stride will do useful work.
+        if (tid < stride)
+          tileData[tid] += tileData[tid + stride];
+
+        tidx.barrier.wait_with_tile_static_memory_fence();
+      }
+
+      //  Write the result for this tile back to global memory
+      if (tid == 0)
+        partialv[tidx.tile[0]] = tileData[tid];
+    });
+```
+
+## Concurrency to the rescue!
+
+
