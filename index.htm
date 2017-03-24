@@ -247,7 +247,7 @@ OpenMP3, OpenMP4, CUDA, Kokkos, Raja, OpenCL, ...</li>
 </div>
 <div class="col-xs-8">
 <ul>
-<li>Convert CUDA to portable C++</li>
+<li>Convert CUDA to portable C++, <code>hipify</code></li>
 <li>C++ kernel language ( C++11/14/17 features )</li>
 <li>C runtime API</li>
 <li>same performance as native CUDA</li>
@@ -259,7 +259,7 @@ OpenMP3, OpenMP4, CUDA, Kokkos, Raja, OpenCL, ...</li>
 streams, events, memory (de-)allocation, profiling</p></li>
 <li>produced apps have full tool support:
 <ul>
-<li>CUDA: nvcc, nvprof, ...</li>
+<li>CUDA: nvcc, nvprof, nvvp</li>
 <li>ROCM: hcc, rocm-prof, codexl</li>
 </ul></li>
 </ul>
@@ -276,11 +276,10 @@ streams, events, memory (de-)allocation, profiling</p></li>
 
 void CUDAStream&lt;T&gt;::add(){
   add_kernel&lt;&lt;&lt;array_size/TBSIZE, TBSIZE&gt;&gt;&gt;(d_a, d_b, d_c);
-  check_error();
-  //..
+  check_error();  //..
   }</code></pre>
 </section><section id="hipified-example" class="slide level2">
-<h1><a href="https://github.com/UoB-HPC/GPU-STREAM/blob/master/HIPStream.cpp#L152">Hipified Example</a></h1>
+<h1><a href="https://github.com/UoB-HPC/GPU-STREAM/blob/master/HIPStream.cpp#L152">Hip`ified Example</a></h1>
 <pre><code>__global__ void add_kernel(hipLaunchParm lp, 
                            const T * a, 
                            const T * b, 
@@ -292,10 +291,31 @@ void CUDAStream&lt;T&gt;::add(){
 void HIPStream&lt;T&gt;::add(){
   hipLaunchKernel(HIP_KERNEL_NAME(add_kernel), 
                   dim3(array_size/TBSIZE), dim3(TBSIZE), 0, 0, 
-                  d_a, d_b, d_c);
-  check_error();
-  //...
+                  d_a, d_b, d_c);  check_error();  //...
 }</code></pre>
+</section><section id="hip-summary" class="slide level2">
+<h1>HIP summary</h1>
+<ul>
+<li><p>very interesting tool to get started with production or legacy code</p></li>
+<li><p>still low-level CUDA programming</p></li>
+<li><p>HIP evosystem available as well: hipBlas, hipFFT, hipRNG, MIOpen (machine learning library)</p></li>
+</ul>
+</section></section>
+<section><section id="heterogenous-compute" class="titleslide slide level1"><h1>Heterogenous Compute</h1></section><section id="hc" class="slide level2">
+<h1>HC</h1>
+<ul>
+<li>C++ parallel runtime and API</li>
+<li>superset of C++AMP</li>
+<li>adds device specific instrinsics (wavefront shuffle, bit extraction, atomics)</li>
+<li>compiled with <code>hcc</code></li>
+<li>very similar to <a href="http://thrust.github.io/">thrust</a>, <a href="https://github.com/boostorg/com">boost.compute</a>, <a href="https://www.khronos.org/sycl">sycl</a></li>
+<li>current C++17 STL implementatipn wraps around this</li>
+</ul>
+</section><section id="hc-api" class="slide level2">
+<h1>HC API</h1>
+<center>
+<img src="fig/hc_api_nutshell.svg" style="width:80.0%" />
+</center>
 </section></section>
       </div>
     </div>

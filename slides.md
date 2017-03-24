@@ -293,7 +293,7 @@ Intel MIC
 
 [column,class="col-xs-8"]
 
-- Convert CUDA to portable C++
+- Convert CUDA to portable C++, `hipify`
 - C++ kernel language ( C++11/14/17 features )
 - C runtime API
 - same performance as native CUDA
@@ -306,7 +306,7 @@ Intel MIC
   streams, events, memory (de-)allocation, profiling
 
 - produced apps have full tool support:
-    - CUDA: nvcc, nvprof, ...
+    - CUDA: nvcc, nvprof, nvvp
     - ROCM: hcc, rocm-prof, codexl
 
 [/column]
@@ -326,12 +326,11 @@ __global__ void add_kernel(const T * a,
 
 void CUDAStream<T>::add(){
   add_kernel<<<array_size/TBSIZE, TBSIZE>>>(d_a, d_b, d_c);
-  check_error();
-  //..
+  check_error();  //..
   }
 ```
 
-## [Hipified Example](https://github.com/UoB-HPC/GPU-STREAM/blob/master/HIPStream.cpp#L152)
+## [Hip`ified Example](https://github.com/UoB-HPC/GPU-STREAM/blob/master/HIPStream.cpp#L152)
 
 ```
 __global__ void add_kernel(hipLaunchParm lp, 
@@ -345,9 +344,33 @@ __global__ void add_kernel(hipLaunchParm lp,
 void HIPStream<T>::add(){
   hipLaunchKernel(HIP_KERNEL_NAME(add_kernel), 
                   dim3(array_size/TBSIZE), dim3(TBSIZE), 0, 0, 
-                  d_a, d_b, d_c);
-  check_error();
-  //...
+                  d_a, d_b, d_c);  check_error();  //...
 }
 ```
 
+## HIP summary
+
+- very interesting tool to get started with production or legacy code
+
+- still low-level CUDA programming
+
+- HIP evosystem available as well: hipBlas, hipFFT, hipRNG, MIOpen (machine learning library)
+
+
+# Heterogenous Compute
+
+## HC
+
+- C++ parallel runtime and API
+- superset of C++AMP
+- adds device specific instrinsics (wavefront shuffle, bit extraction, atomics)
+- compiled with `hcc`
+- very similar to [thrust](http://thrust.github.io/), [boost.compute](https://github.com/boostorg/com), [sycl](https://www.khronos.org/sycl)
+- current C++17 STL implementatipn wraps around this
+
+
+## HC API
+
+<center>
+![](fig/hc_api_nutshell.svg){ width=80% }
+</center>

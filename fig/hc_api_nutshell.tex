@@ -17,13 +17,14 @@
     reset transform,
     fit={(\pgf@pathminx,\pgf@pathminy) (\pgf@pathmaxx,\pgf@pathmaxy)}
   },
-  reset transform/.code={\pgftransformreset}
+  reset transform/.code={\pgftransformreset},
+  node/.append style={text color=white, color=white}
 }
 \makeatother
 
 
 \begin{document}
-\begin{tikzpicture}
+\begin{tikzpicture}[every node/.style={color=white}]
 
   \node [draw,thick,rectangle, minimum width=3cm, minimum height=2cm] at(0,0) (host) {\bfseries{}Host CPU(s)};
   \node [draw,dashed,rectangle, minimum width=3cm, minimum height=1cm, anchor=south] at (host.north)(host_memory) {\bfseries{}Host Memory};
@@ -39,8 +40,8 @@
   \node at($(device.west)!.5!(device.north west)$) (pcie_topright) {};
   \node at($(device.west)!.5!(device.south west)$) (pcie_botright) {};
 
-  \draw [thick] (pcie_topleft) -- (pcie_topright);
-  \draw [thick] (pcie_botleft) -- (pcie_botright);
+  \draw [thick,color=white] (pcie_topleft) -- (pcie_topright);
+  \draw [thick,color=white] (pcie_botleft) -- (pcie_botright);
 
 
   %decripe hc API
