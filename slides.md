@@ -361,7 +361,7 @@ void HIPStream<T>::add(){
 
 ## HC
 
-- C++ parallel runtime and API
+- C++ parallel runtime and [API](https://scchan.github.io/hcc/index.html)
 - superset of C++AMP
 - adds device specific instrinsics (wavefront shuffle, bit extraction, atomics)
 - compiled with `hcc`
@@ -371,7 +371,7 @@ void HIPStream<T>::add(){
 
 ## HC API
 
-<center>
+
 ![](fig/hc_api_nutshell.svg){ width=80% }
 </center>
 
@@ -423,9 +423,11 @@ void HCStream<T>::add()
 								});
 ```
 
-## Let's compare
+## Let's compare the results
 
-<plot comparing memory bandwidth of opencl, hip and hc>
+<center>
+![](data/gpu_stream_lim_add.svg){ width=80% }
+</center>
 
 ## That doesn't mean it's easy
 
@@ -473,7 +475,6 @@ void HCStream<T>::add()
 
 ## Concurrency to the rescue!
 
-Feature preview of Concurrency TS in a host-device setting.
 
 
 ## Concurrency continued
@@ -484,15 +485,29 @@ Feature preview of Concurrency TS in a host-device setting.
 
 # Summary
 
-## What I[^1] learned so far
+## What I learned so far
 
 - AMD's ROCm/ROCr stack is a very young and ambitious project
 - full open-source driver, runtime and compiler for dGPU
-- `hc` based on C++AMP includes C++17 or C++20 features for GPU computing
+- `hc` based on C++AMP API with improvements and extensions
 - `hc` API is expressive and reduces boiler-plate code
+- ecosystem and tooling are not there yet for production HPC codes
+
+## What I observe
+
+- CUDA/OpenCL as the community's working horse are low-level and enforces a lot of boiler plate
+- [thrust](http://thrust.github.io/), [boost.compute](https://github.com/boostorg/com), [sycl](https://www.khronos.org/sycl), [hc](https://scchan.github.io/hcc/index.html) encapsulate this at the expense of feature parity
+- C++17/C++20 concurrency and parallelism extensions good for multi-core, not ideal for host-device cleavage
+- hoping for a solid parallel STL with solid vendor specific C++ interfaces
+
+&nbsp;
+
+. . . 
 
 <center>
-    **Thank you for your attention!**
+**Thank you for your attention!**
 </center>
 
-[^1]: with feedback by [Ben Sander](mailto:ben.sander@amd.com) and [Alex Voicu](mailto:Alexandru.Voicu@amd.com)
+<center>
+(Thanks to [Ben Sander](mailto:ben.sander@amd.com) and [Alex Voicu](mailto:Alexandru.Voicu@amd.com) for their valuable feedback!)
+</center>

@@ -12,14 +12,33 @@ df = df1 %>% bind_rows(df2) %>% bind_rows(df3)
 
 
 colnames(df) = c("alg","bw_mb_per_sec","maxv","meanv","minv","sizeof","array_size","total_volume_gb","api")
+df$sizeof = as.factor(df$sizeof)
+df$alg = as.factor(df$alg)
+levels(df$sizeof) = c("float","double")
 
-head(df)
-
-add_plot = ggplot(df,aes(total_volume_gb,bw_mb_per_sec/1024.,color=api,shape=as.factor(sizeof))) + theme_bw()
-add_plot = add_plot + geom_point() 
+adddf = df %>% filter(alg == "Add")
+glimpse(adddf)
+add_plot = ggplot( adddf ,aes(total_volume_gb ,bw_mb_per_sec/1024.,color=api)) + theme_bw()
+add_plot = add_plot + geom_line() + facet_wrap( ~ sizeof )
 add_plot = add_plot + ggtitle("GPU-Stream Add on AMD R9 Fiji Nano with rocm 1.4 (Ubuntu 14.04.5)")
-add_plot = add_plot + xlab("array size / GB") + ylab(" mean(Bandwidth) / GB/s")
+add_plot = add_plot + xlab("used device memory / GB") + ylab(" mean(Bandwidth) / GB/s")
 ## add_plot = add_plot + scale_y_log10() 
 ## add_plot = add_plot + scale_x_log10() 
 ggsave("gpu_stream_add.png",add_plot)
 ggsave("gpu_stream_add.svg",add_plot)
+
+
+lim_add_plot = ggplot( adddf ,aes(total_volume_gb ,bw_mb_per_sec/1024.,color=api)) + theme_bw()
+lim_add_plot = lim_add_plot + geom_line() + facet_wrap( ~ sizeof )
+lim_add_plot = lim_add_plot + ggtitle("GPU-Stream Add on AMD R9 Fiji Nano with rocm 1.4 (Ubuntu 14.04.5)")
+lim_add_plot = lim_add_plot + xlab("used device memory / GB") + ylab(" mean(Bandwidth) / GB/s")
+lim_add_plot = lim_add_plot + xlim(0,2) + ylim(350,500) 
+
+ratio.display <- 16/9
+ratio.values <- (2*1024)/(max(adddf$bw_mb_per_sec)-min(adddf$bw_mb_per_sec))
+lim_add_plot = lim_add_plot + coord_fixed(4*ratio.values / ratio.display)
+
+## lim_add_plot = lim_add_plot + scale_y_log10() 
+## lim_add_plot = lim_add_plot + scale_x_log10() 
+ggsave("gpu_stream_lim_add.png",lim_add_plot,height=5)
+ggsave("gpu_stream_lim_add.svg",lim_add_plot,height=5)

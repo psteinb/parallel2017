@@ -304,7 +304,7 @@ void HIPStream&lt;T&gt;::add(){
 <section><section id="heterogenous-compute" class="titleslide slide level1"><h1>Heterogenous Compute</h1></section><section id="hc" class="slide level2">
 <h1>HC</h1>
 <ul>
-<li>C++ parallel runtime and API</li>
+<li>C++ parallel runtime and <a href="https://scchan.github.io/hcc/index.html">API</a></li>
 <li>superset of C++AMP</li>
 <li>adds device specific instrinsics (wavefront shuffle, bit extraction, atomics)</li>
 <li>compiled with <code>hcc</code></li>
@@ -357,7 +357,7 @@ void HCStream&lt;T&gt;::add()
                                 });</code></pre>
 </section><section id="lets-compare" class="slide level2">
 <h1>Let's compare</h1>
-<p><plot comparing memory bandwidth of opencl, hip and hc></p>
+<p><em>plot comparing memory bandwidth of opencl, hip and hc</em></p>
 </section><section id="that-doesnt-mean-its-easy" class="slide level2">
 <h1>That doesn't mean it's easy</h1>
 <pre><code>  hc::completion_future dot_kernel = hc::parallel_for_each(tiled_ex,
@@ -407,22 +407,30 @@ void HCStream&lt;T&gt;::add()
 </section><section id="concurrency-profile" class="slide level2">
 <h1>Concurrency profile</h1>
 </section></section>
-<section><section id="summary" class="titleslide slide level1"><h1>Summary</h1></section><section id="what-i1-learned-so-far" class="slide level2">
-<h1>What I<a href="#/fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> learned so far</h1>
+<section><section id="summary" class="titleslide slide level1"><h1>Summary</h1></section><section id="what-i-learned-so-far" class="slide level2">
+<h1>What I learned so far</h1>
 <ul>
 <li>AMD's ROCm/ROCr stack is a very young and ambitious project</li>
 <li>full open-source driver, runtime and compiler for dGPU</li>
-<li><code>hc</code> based on C++AMP includes C++17 or C++20 features for GPU computing</li>
+<li><code>hc</code> based on C++AMP API with improvements and extensions</li>
 <li><code>hc</code> API is expressive and reduces boiler-plate code</li>
+<li>ecosystem and tooling are not there yet for production HPC codes</li>
 </ul>
+</section><section id="what-i-observe" class="slide level2">
+<h1>What I observe</h1>
+<ul>
+<li>CUDA/OpenCL as the community's working horse are low-level and enforces a lot of boiler plate</li>
+<li><a href="http://thrust.github.io/">thrust</a>, <a href="https://github.com/boostorg/com">boost.compute</a>, <a href="https://www.khronos.org/sycl">sycl</a>, <a href="https://scchan.github.io/hcc/index.html">hc</a> encapsulate this at the expense of feature parity</li>
+<li>C++17/C++20 concurrency and parallelism extensions good for multi-core, not ideal for host-device cleavage</li>
+<li>hoping for a solid parallel STL with solid vendor specific C++ interfaces</li>
+</ul>
+<p> </p>
+<div class="fragment">
 <center>
-<pre><code>**Thank you for your attention!**</code></pre>
+<strong>Thank you for your attention!</strong>
 </center>
-</section></section>
-<section class="footnotes">
-<hr />
-<ol>
-<li id="fn1"><p>with feedback by <script type="text/javascript">
+<center>
+(Thanks to <script type="text/javascript">
 <!--
 h='&#x61;&#x6d;&#100;&#46;&#x63;&#x6f;&#x6d;';a='&#64;';n='&#98;&#x65;&#110;&#46;&#x73;&#x61;&#110;&#100;&#x65;&#114;';e=n+a+h;
 document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'&#66;&#x65;&#110;&#32;&#x53;&#x61;&#110;&#100;&#x65;&#114;'+'<\/'+'a'+'>');
@@ -432,9 +440,10 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'&#66
 h='&#x61;&#x6d;&#100;&#46;&#x63;&#x6f;&#x6d;';a='&#64;';n='&#x41;&#108;&#x65;&#120;&#x61;&#110;&#100;&#114;&#x75;&#46;&#86;&#x6f;&#x69;&#x63;&#x75;';e=n+a+h;
 document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'&#x41;&#108;&#x65;&#120;&#32;&#86;&#x6f;&#x69;&#x63;&#x75;'+'<\/'+'a'+'>');
 // -->
-</script><noscript>&#x41;&#108;&#x65;&#120;&#32;&#86;&#x6f;&#x69;&#x63;&#x75;&#32;&#40;&#x41;&#108;&#x65;&#120;&#x61;&#110;&#100;&#114;&#x75;&#46;&#86;&#x6f;&#x69;&#x63;&#x75;&#32;&#x61;&#116;&#32;&#x61;&#x6d;&#100;&#32;&#100;&#x6f;&#116;&#32;&#x63;&#x6f;&#x6d;&#x29;</noscript><a href="#/fnref1">↩</a></p></li>
-</ol>
-</section>
+</script><noscript>&#x41;&#108;&#x65;&#120;&#32;&#86;&#x6f;&#x69;&#x63;&#x75;&#32;&#40;&#x41;&#108;&#x65;&#120;&#x61;&#110;&#100;&#114;&#x75;&#46;&#86;&#x6f;&#x69;&#x63;&#x75;&#32;&#x61;&#116;&#32;&#x61;&#x6d;&#100;&#32;&#100;&#x6f;&#116;&#32;&#x63;&#x6f;&#x6d;&#x29;</noscript> for their valuable feedback!)
+</center>
+</div>
+</section></section>
       </div>
     </div>
 
