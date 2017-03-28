@@ -47,13 +47,15 @@
   %decripe hc API
 
   \node [above=5mm of host_memory] (stdvec) {\texttt{std::vector}};
-  \node [above=5mm of device_memory,text width=3cm, align=center] (hcarr) {\texttt{hc::array} \texttt{hc::array\_view}};
+  \node [above=5mm of device_memory,text width=3cm, align=center] (hcarr) {\texttt{vendor::array} \texttt{vendor::array\_view}};
   
-  \node [below=of pcie, text width=4cm, align=center] (stdvec) {\texttt{hc::copy}, \texttt{hc::async\_copy}, \texttt{std::future}, \texttt{std::when\_all}, \dots{}};
+  \node [below=of pcie, text width=4cm, align=center] (stdvec) {\texttt{vendor::copy}, \texttt{vendor::async\_copy}, \texttt{std::future}, \texttt{std::when\_all}, \dots{}};
 
-  \node [below=5mm of device, align=center] (stdvec) {\texttt{std::for\_each(vendor::device\_policy, ...}};
+  \node [below=5mm of device.south west, align=left,anchor=west, text width=7.5cm] (dforeach) {\texttt{std::for\_each(vendor::par, ...)}};
 
-  \node [below=5mm of host, align=center] (stdvec) {\texttt{std::for\_each(std::par, ...)}};
+  \node [below=1mm of dforeach, align=left,text width=7.5cm] (dacc) {\texttt{std::accumulate(vendor::par, ...)}};
+
+  \node [below=5mm of host.south east, align=center, anchor=east] (stdvec) {\texttt{std::for\_each(std::par, ...)}};
 
 \end{tikzpicture}
 \end{document}
