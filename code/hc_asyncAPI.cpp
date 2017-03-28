@@ -28,39 +28,49 @@ int main(int argc, char *argv[])
                                                        hc::array_view<int,1>(on_device[1])};
 
     auto inbegin = h_payload.begin();
-    auto outbegin = h_results.begin();
 
     auto start = std::chrono::high_resolution_clock::now();
     for(int i = 0;i<streams.size();i++){
-
-        streams[i] = hc::copy_async(inbegin,inbegin+half_len,on_device[i]);
-        //streams[i].wait();
-
+      streams[i] = hc::copy_async(inbegin,inbegin+half_len,on_device[i]);
+      
+      inbegin += half_len;
+    }
+       
+    
+    for(int i = 0;i<streams.size();i++){
         auto current_view = on_device[i].view_as(on_device[i].get_extent());
         auto future = hc::parallel_for_each(on_device[i].get_extent(),
                                             [=](hc::index<1> idx) [[hc]] {
                                                 current_view[idx] *= 4;
                                             });
-        //
-        streams[i].then([&](){
-                future.wait();
-            });
-        streams[i].wait();
-
-        streams[i] = hc::copy_async(on_device[i],outbegin);
-        streams[i].wait();
-
-        inbegin += half_len;
-        outbegin += half_len;
+    
     }
+
+    
+    auto outbegin = h_results.begin();
+
+    for(int i = 0;i<streams.size();i++){
+        
+        streams[i] = hc::copy_async(on_device[i],outbegin);
+
+	outbegin += half_len;
+
+    }
+
+    for(hc::completion_future streams : streams){
+      streams.wait();
+    }
+    
     auto end = std::chrono::high_resolution_clock::now();
 
+    for(std::size_t i = 0;i<h_results.size();++i)
+      {
+	if(h_results[0] != 4*h_payload[0]){
+	  std::cerr << "["<< i<<"] uuups, output ("<< h_results[i] <<") is not as expected ("<< 4*h_payload[i] << ")\n";
+	  return 1;
+	}
+      }
 
-    if(h_results[0] == 4*h_payload[0])
-        return 0;
-    else{
-        std::cerr << "uuups, output ("<< h_results[0] <<") is not as expected ("<< 4*h_payload[0] << ")\n";
-        return 1;
-    }
+    return 0;
 
 }
