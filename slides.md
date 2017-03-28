@@ -17,14 +17,14 @@ date: March 30, 2017
 [column,class="col-xs-6"]
 
 ![](img/scionics_main_logo.png)  
-[Scionics Computer Innovation GmbH](scionics.de)
+[Scionics Computer Innovation GmbH](https://www.scionics.com/)
 
 [/column]
 
 [column,class="col-xs-6"]
 
 - founded in 2000, Dresden (Germany)
-- service provider to the [Max Planck Institute of Molecular Cell Biology and Genetics](mpi-cbg.de)  
+- service provider to the [Max Planck Institute of Molecular Cell Biology and Genetics](https://www.mpi-cbg.de/home/)  
 
     - scientific computing facility
     - IT infrastructure
@@ -96,28 +96,28 @@ Intel MIC
 </center>
 
 
-## This Talk != Advertisement 
-
-<center>
-**AMD provided test hardware and that's it!**
-</center>
-
-
-- Our company is by no means financially tied to AMD nor any of it's resellers.
-
-- whatever I find missing or not working, I'll report it here
-(use the [issue tracker](https://github.com/psteinb/parallel2017/issues) of this talk to correct me)
-
-
-
 ## This Talk is
-
 
 <center>
 ![](img/opensource-550x475.png)  
 
 **[github.com/psteinb/parallel2017](https://github.com/psteinb/parallel2017)**
 </center>
+
+## This Talk != Advertisement 
+
+- Our company is by no means financially tied to AMD nor any of it's resellers.
+- AMD provided test hardware and that's it
+- whatever I find missing or not working, I'll report it here
+
+&nbsp;
+
+<center>
+**Use the [issue tracker](https://github.com/psteinb/parallel2017/issues) of this talk to correct me!**
+
+[github.com/psteinb/parallel2017](https://github.com/psteinb/parallel2017)
+</center>
+
 
 
 ## Outline
@@ -186,6 +186,12 @@ Intel MIC
 - peer-to-peer Multi-GPU
 - peer-to-peer with RDMA
 - systems management API and tooling
+- supported GPUs: GFX8 GPU's ( Fiji & Polaris Family)
+- supported CPUs:
+
+	- Intel Xeon E3/E5, Core i3/5/7 Haswell or newer
+	- (upcoming) AMD Naples/Ryzen
+	- (upcoming) Cavium Thunder X
 
 </center>
 
@@ -266,7 +272,8 @@ Intel MIC
 /* triad */ a[:]    = b[:] + scalar*c[:] 
 /* dot   */ scalar  = dot(a[:],b[:])
 ```
-  
+
+&nbsp;
 
 <center>
 
@@ -284,7 +291,7 @@ Intel MIC
 
 <center>
 
-![](fig/hipify-pipeline.svg){ width=65% }
+![](fig/hipify-pipeline.svg){ width=50% }
 
 </center>
 
@@ -334,8 +341,7 @@ void CUDAStream<T>::add(){
 
 ```
 __global__ void add_kernel(hipLaunchParm lp, 
-                           const T * a, 
-                           const T * b, 
+                           const T * a, const T * b, 
                            T * c){
   const int i = hipBlockDim_x * hipBlockIdx_x + hipThreadIdx_x;
   c[i] = a[i] + b[i];
@@ -354,7 +360,7 @@ void HIPStream<T>::add(){
 
 - still low-level CUDA programming
 
-- HIP evosystem available as well: hipBlas, hipFFT, hipRNG, MIOpen (machine learning library)
+- HIP library eco-system available as well: [hipBlas](https://bitbucket.org/multicoreware/hcblas), [hipFFT](https://bitbucket.org/multicoreware/hcFFT), [hipRNG](https://bitbucket.org/multicoreware/hcrng), ...
 
 
 # Heterogenous Compute
@@ -362,18 +368,25 @@ void HIPStream<T>::add(){
 ## HC
 
 - C++ parallel runtime and [API](https://scchan.github.io/hcc/index.html)
-- superset of C++AMP
-- adds device specific instrinsics (wavefront shuffle, bit extraction, atomics)
-- compiled with `hcc`
-- very similar to [thrust](http://thrust.github.io/), [boost.compute](https://github.com/boostorg/com), [sycl](https://www.khronos.org/sycl)
-- current C++17 STL implementatipn wraps around this
+- based on C++AMP in `hc` namespace plus C++14
+- (asynchronous) copy commands for host-device i/o
+- explicit pointer-based memory allocation (am_alloc / am_free)
+- hc::accelerator_view, hc::array_view, hc::completion_future
+- device specific 'instrinsics' (wavefront shuffle, bit extraction, atomics)
 
 
-## HC API
+<center>
+&nbsp;
 
+**Very similar to [thrust](http://thrust.github.io/), [boost.compute](https://github.com/boostorg/com), [sycl](https://www.khronos.org/sycl).**
+</center>
 
+## HC API Overview
+
+<center>
 ![](fig/hc_api_nutshell.svg){ width=80% }
 </center>
+
 
 ## HC in [GPU-STREAM](https://github.com/UoB-HPC/GPU-STREAM), Declaration
 
@@ -385,15 +398,14 @@ template <class T>
 class HCStream : public Stream<T>
 {
 protected:
-  // Size of arrays
   unsigned int array_size;
-  // Device side pointers to arrays
   hc::array<T,1> d_a;
   hc::array<T,1> d_b;
   hc::array<T,1> d_c;
+  //...
 ```
 
-## HC in [GPU-STREAM](https://github.com/UoB-HPC/GPU-STREAM), Initialization
+## HC in [GPU-STREAM](https://github.com/UoB-HPC/GPU-STREAM), Init Data
 
 ```
 template <class T>
@@ -429,59 +441,77 @@ void HCStream<T>::add()
 ![](data/gpu_stream_lim_add.svg){ width=80% }
 </center>
 
-## That doesn't mean it's easy
+## HC can be low-level too ([WIP](https://github.com/psteinb/GPU-STREAM/blob/rocm_hc_support/HCStream.cpp))
 
 ```
-  hc::completion_future dot_kernel = hc::parallel_for_each(tiled_ex,
-    [=](hc::tiled_index<1> tidx) [[hc]] {
+hc::parallel_for_each(tiled_ex,
+					  [=,
+					  &view_a,
+					  &view_b,
+					  &partial](const hc::tiled_index<1>& tidx) [[hc]] {
 
-      std::size_t tid = tidx.local[0];//index in the tile
+	auto gidx = tidx.global[0];
+	T r = T{0}; // Assumes reduction op is addition.
+	while (gidx < view_a.get_extent().size()) {
+		r += view_a[gidx] * view_b[gidx]; //dot-product
+		gidx += domain_sz;
+	}
 
-      tile_static T tileData[TBSIZE];
+	tile_static T tileData[TBSIZE];
+	tileData[tidx.local[0]] = r;
 
-      std::size_t i = (tidx.tile[0] * 2 * TBSIZE) + tid;
-      std::size_t stride = TBSIZE * 2 * n_tiles;
+	tidx.barrier.wait_with_tile_static_memory_fence();
 
-      //  Load and add many elements, rather than just two
-      T sum = 0;
-      do
-      {
-        T near = view_a[i]*view_b[i];
-        T far = view_a[i+TBSIZE]*view_b[i+TBSIZE];
-        sum += (far + near);
-        i += stride;
-      }
-      while (i < n_elements);
-      tileData[tid] = sum;
+	for (auto h = TBSIZE / 2; h; h /= 2) {
+		if (tidx.local[0] < h) {
+			tileData[tidx.local[0]] += tileData[tidx.local[0] + h];
+		}
+		tidx.barrier.wait_with_tile_static_memory_fence();
+	}
 
-      tidx.barrier.wait();
-
-      //  Reduce values for data on this tile
-      for (stride = (TBSIZE / 2); stride > 0; stride >>= 1)
-      {
-        //  Remember that this is a branch within a loop and all threads will have to execute
-        //  this but only threads with a tid < stride will do useful work.
-        if (tid < stride)
-          tileData[tid] += tileData[tid + stride];
-
-        tidx.barrier.wait_with_tile_static_memory_fence();
-      }
-
-      //  Write the result for this tile back to global memory
-      if (tid == 0)
-        partialv[tidx.tile[0]] = tileData[tid];
-    });
+	if (tidx.global == tidx.tile_origin) partial[tidx.tile] = tileData[0];
 ```
 
-## Concurrency to the rescue!
+## Concurrency constructs 
 
+- asynchronous operations (memory copies, kernel launches) return completion future
 
+```
+std::vector<float> payload  (/*pick a number*/);
+hc::array<float,1> d_payload(payload.size());
+hc::completion_future when_done = hc::async_copy(payload.begin(),
+	payload.end(),
+	d_payload);
+when_done.then(call_kernel_functor); //continuation function!
+```
+. . .
 
-## Concurrency continued
+- for me hc::completion_future::then API not production ready yet:
 
+```
+template<typename functor >
+void 	then (const functor &func);//just a callback for now
+```
 
-## Concurrency profile
+## Concurrency TS?
 
+```
+for(hc::completion_future when_done : streams){
+	when_done = hc::async_copy(payload_begin_itr,
+	payload_end_itr,
+	d_payload_itr);
+	when_done.then(parallel_for_each(/*do magic*/))
+		     .then(hc::async_copy());
+}
+
+hc::when_all(streams);
+```
+
+<center>
+concurrency constructs are the glue code of host-device interactions!
+
+(see [when_all](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4399.html#futures.when_all), [co_await](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0057r3.pdf) and friends)
+</center>
 
 # Summary
 
@@ -489,19 +519,29 @@ void HCStream<T>::add()
 
 - AMD's ROCm/ROCr stack is a very young and ambitious project
 - full open-source driver, runtime and compiler for dGPU
-- `hc` based on C++AMP API with improvements and extensions
 - `hc` API is expressive and reduces boiler-plate code
-- ecosystem and tooling are not there yet for production HPC codes
-
-## What I observe
-
-- CUDA/OpenCL as the community's working horse are low-level and enforces a lot of boiler plate
-- [thrust](http://thrust.github.io/), [boost.compute](https://github.com/boostorg/com), [sycl](https://www.khronos.org/sycl), [hc](https://scchan.github.io/hcc/index.html) encapsulate this at the expense of feature parity
-- C++17/C++20 concurrency and parallelism extensions good for multi-core, not ideal for host-device cleavage
-- hoping for a solid parallel STL with solid vendor specific C++ interfaces
+- ecosystem and tooling are not there yet for production (HPC) codes
 
 &nbsp;
 
+<center>
+**Open-source driver, runtime stack, compiler and language for GPU computing is an interesting approach to keep an eye on!**
+</center>
+
+
+## What I observe
+
+- CUDA/OpenCL as the community's working horse are low-level and enforce a lot of boiler plate
+- [thrust](http://thrust.github.io/), [boost.compute](https://github.com/boostorg/com), [sycl](https://www.khronos.org/sycl), [hc](https://scchan.github.io/hcc/index.html) encapsulate this  
+  (sometimes at the expense of feature parity)
+- [C++17 parallelism extensions](https://herbsutter.com/2017/03/24/trip-report-winter-iso-c-standards-meeting-kona-c17-is-complete/) and C++20 concurrency good for multi-core
+- hoping for a solid parallel STL with solid vendor specific C++ interfaces
+
+## My Hopes and Acks
+
+<center>
+![](fig/future_dgpu_api.svg){ width=80% }
+</center>
 . . . 
 
 <center>
