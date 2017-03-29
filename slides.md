@@ -441,6 +441,13 @@ void HCStream<T>::add()
 ![](data/gpu_stream_lim_add.svg){ width=80% }
 </center>
 
+## Comparing to HBM2 and GDDR5
+
+<center>
+![](data/gpu_stream_lim_add_with_nvidia.svg){ width=90% }
+</center>
+
+
 ## HC can be low-level too ([WIP](https://github.com/psteinb/GPU-STREAM/blob/rocm_hc_support/HCStream.cpp))
 
 ```
