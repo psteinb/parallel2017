@@ -30,6 +30,8 @@ add_with_cuda = df_with_cuda %>% filter(alg == "Add")
 adddf = df %>% filter(alg == "Add")
 
 glimpse(adddf)
+
+
 add_plot = ggplot( adddf ,aes(total_volume_gb ,bw_mb_per_sec/1024.,color=api)) + theme_bw()
 add_plot = add_plot + geom_line(size=2) + facet_wrap( ~ sizeof )
 add_plot = add_plot + ggtitle("GPU-Stream Add : AMD R9 Fiji Nano (rocm 1.4)")

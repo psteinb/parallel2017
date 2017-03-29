@@ -136,5 +136,5 @@
 <g clip-path='url(#cp8)'><text x='439.51' y='124.94' style='font-size: 8.80pt; font-family: Arial;'>hc-stream</text></g>
 <g clip-path='url(#cp8)'><text x='439.51' y='142.22' style='font-size: 8.80pt; font-family: Arial;'>hip</text></g>
 <g clip-path='url(#cp8)'><text x='439.51' y='159.50' style='font-size: 8.80pt; font-family: Arial;'>opencl</text></g>
-<g clip-path='url(#cp8)'><text x='49.79' y='17.90' style='font-size: 13.20pt; font-family: Arial;'>GPU-Stream Add on AMD R9 Fiji Nano with rocm 1.4 (Ubuntu 14.04.5)</text></g>
+<g clip-path='url(#cp8)'><text x='49.79' y='17.90' style='font-size: 13.20pt; font-family: Arial;'>GPU-Stream Add : AMD R9 Fiji Nano (rocm 1.4)</text></g>
 </svg>
