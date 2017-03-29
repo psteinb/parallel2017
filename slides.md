@@ -76,6 +76,7 @@ Intel MIC
 
 **What should our clients choose?**
 
+Share experiences with ROCm/ROCr with community!
 </center>
 
 
@@ -562,7 +563,7 @@ concurrency constructs are the glue code of host-device interactions!
 - AMD's ROCm/ROCr stack is a very young and ambitious project
 - full open-source driver, runtime and compiler for dGPU
 - `hc` API is expressive and reduces boiler-plate code (plans for C++17 on device)
-- tooling are not there yet for production (HPC) codes
+- tooling and documentation are not there yet for production (HPC) codes
 
 &nbsp;
 
