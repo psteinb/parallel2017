@@ -265,13 +265,16 @@ Intel MIC
 [column,class="col-xs-8"]
 
 
-- [hcc](https://github.com/RadeonOpenCompute/hcc) compiler for supported APIs
+- [hcc](https://github.com/RadeonOpenCompute/hcc) compiler for supported APIs:
+
+    - OpenMP (OpenMP4 accelerator offloading in development)
+    - HIP & HC
+    - OpenCL
+
 - LLVM native GCN ISA code generation
 - offline compilation support
 - standardized loader and code object format
 - GCN ISA assembler and disassembler
-- OpenMP, HIP, HC and OpenCL programming interface   
-(OpenMP4 accelerator offloading in development)
 
 
 [/column]
@@ -290,9 +293,9 @@ Intel MIC
 ## [UoB-HPC/GPU-STREAM](https://github.com/UoB-HPC/GPU-STREAM)
 
 ```
-/* add   */ c[:]    = a[:]
+/* copy  */ c[:]    = a[:]
 /* mul   */ b[:]    = scalar*b[:]
-/* copy  */ c[:]    = a[:] + b[:]
+/* add   */ c[:]    = a[:] + b[:]
 /* triad */ a[:]    = b[:] + scalar*c[:] 
 /* dot   */ scalar  = dot(a[:],b[:])
 ```
@@ -390,7 +393,7 @@ void HIPStream<T>::add(){
 
 - still low-level CUDA programming
 
-- HIP library eco-system available as well: [hipBlas](https://bitbucket.org/multicoreware/hcblas), [hipFFT](https://bitbucket.org/multicoreware/hcFFT), [hipRNG](https://bitbucket.org/multicoreware/hcrng), ...
+- HIP library eco-system available: [hipBlas](https://bitbucket.org/multicoreware/hcblas), [hipFFT](https://bitbucket.org/multicoreware/hcFFT), [hipRNG](https://bitbucket.org/multicoreware/hcrng), machine learning acceleration, ...
 
 
 # Heterogenous Compute
@@ -471,7 +474,7 @@ void HCStream<T>::add()
 ![](data/gpu_stream_lim_add.svg){ width=80% }
 </center>
 
-## Comparing to HBM2 and GDDR5
+## Comparing to HBM2 and GDDR5X
 
 <center>
 ![](data/gpu_stream_lim_add_with_nvidia.svg){ width=90% }
@@ -533,12 +536,14 @@ void 	then (const functor &func);//just a callback for now
 ## Concurrency TS?
 
 ```
+std::vector<hc::completion_future> streams(n);
 for(hc::completion_future when_done : streams){
+
 	when_done = hc::async_copy(payload_begin_itr,
-	payload_end_itr,
-	d_payload_itr);
+                               payload_end_itr,
+                               d_payload_view);
 	when_done.then(parallel_for_each(/*do magic*/))
-		     .then(hc::async_copy());
+		     .then(hc::async_copy(d_payload_view,result_begin_itr));
 }
 
 hc::when_all(streams);
@@ -556,13 +561,13 @@ concurrency constructs are the glue code of host-device interactions!
 
 - AMD's ROCm/ROCr stack is a very young and ambitious project
 - full open-source driver, runtime and compiler for dGPU
-- `hc` API is expressive and reduces boiler-plate code
-- ecosystem and tooling are not there yet for production (HPC) codes
+- `hc` API is expressive and reduces boiler-plate code (plans for C++17 on device)
+- tooling are not there yet for production (HPC) codes
 
 &nbsp;
 
 <center>
-**Open-source driver, runtime stack, compiler and language for GPU computing is an interesting approach to keep an eye on!**
+**Still an interesting approach to keep an eye on!**
 </center>
 
 
@@ -571,8 +576,7 @@ concurrency constructs are the glue code of host-device interactions!
 - CUDA/OpenCL as the community's working horse are low-level and enforce a lot of boiler plate
 - [thrust](http://thrust.github.io/), [boost.compute](https://github.com/boostorg/com), [sycl](https://www.khronos.org/sycl), [hc](https://scchan.github.io/hcc/index.html) encapsulate this  
   (sometimes at the expense of feature parity)
-- [C++17 parallelism extensions](https://herbsutter.com/2017/03/24/trip-report-winter-iso-c-standards-meeting-kona-c17-is-complete/) and C++20 concurrency good for multi-core
-- hoping for a solid parallel STL with solid vendor specific C++ interfaces
+- [C++17 parallelism extensions](https://herbsutter.com/2017/03/24/trip-report-winter-iso-c-standards-meeting-kona-c17-is-complete/) and C++20 concurrency good for multi-core, why not for dGPUs?
 
 ## My Hopes and Acks
 

@@ -230,13 +230,16 @@ Movie does not work! Sorry!
 </div>
 <div class="col-xs-8">
 <ul>
-<li><a href="https://github.com/RadeonOpenCompute/hcc">hcc</a> compiler for supported APIs</li>
+<li><p><a href="https://github.com/RadeonOpenCompute/hcc">hcc</a> compiler for supported APIs:</p>
+<ul>
+<li>OpenMP (OpenMP4 accelerator offloading in development)</li>
+<li>HIP &amp; HC</li>
+<li>OpenCL</li>
+</ul></li>
 <li>LLVM native GCN ISA code generation</li>
 <li>offline compilation support</li>
 <li>standardized loader and code object format</li>
-<li>GCN ISA assembler and disassembler</li>
-<li>OpenMP, HIP, HC and OpenCL programming interface<br />
-(OpenMP4 accelerator offloading in development)</li>
+<li><p>GCN ISA assembler and disassembler</p></li>
 </ul>
 </div>
 </div>
@@ -249,9 +252,9 @@ Movie does not work! Sorry!
 </center>
 </section><section id="uob-hpcgpu-stream" class="slide level2">
 <h1><a href="https://github.com/UoB-HPC/GPU-STREAM">UoB-HPC/GPU-STREAM</a></h1>
-<pre><code>/* add   */ c[:]    = a[:]
+<pre><code>/* copy  */ c[:]    = a[:]
 /* mul   */ b[:]    = scalar*b[:]
-/* copy  */ c[:]    = a[:] + b[:]
+/* add   */ c[:]    = a[:] + b[:]
 /* triad */ a[:]    = b[:] + scalar*c[:] 
 /* dot   */ scalar  = dot(a[:],b[:])</code></pre>
 <p> </p>
@@ -325,7 +328,7 @@ void HIPStream&lt;T&gt;::add(){
 <ul>
 <li><p>very interesting tool to get started with production or legacy code</p></li>
 <li><p>still low-level CUDA programming</p></li>
-<li><p>HIP library eco-system available as well: <a href="https://bitbucket.org/multicoreware/hcblas">hipBlas</a>, <a href="https://bitbucket.org/multicoreware/hcFFT">hipFFT</a>, <a href="https://bitbucket.org/multicoreware/hcrng">hipRNG</a>, ...</p></li>
+<li><p>HIP library eco-system available: <a href="https://bitbucket.org/multicoreware/hcblas">hipBlas</a>, <a href="https://bitbucket.org/multicoreware/hcFFT">hipFFT</a>, <a href="https://bitbucket.org/multicoreware/hcrng">hipRNG</a>, machine learning acceleration, ...</p></li>
 </ul>
 </section></section>
 <section><section id="heterogenous-compute" class="titleslide slide level1"><h1>Heterogenous Compute</h1></section><section id="hc" class="slide level2">
@@ -390,8 +393,8 @@ void HCStream&lt;T&gt;::add()
 <center>
 <img src="data/gpu_stream_lim_add.svg" style="width:80.0%" />
 </center>
-</section><section id="comparing-to-hbm2-and-gddr5" class="slide level2">
-<h1>Comparing to HBM2 and GDDR5</h1>
+</section><section id="comparing-to-hbm2-and-gddr5x" class="slide level2">
+<h1>Comparing to HBM2 and GDDR5X</h1>
 <center>
 <img src="data/gpu_stream_lim_add_with_nvidia.svg" style="width:90.0%" />
 </center>
@@ -443,12 +446,14 @@ void    then (const functor &amp;func);//just a callback for now</code></pre>
 </div>
 </section><section id="concurrency-ts" class="slide level2">
 <h1>Concurrency TS?</h1>
-<pre><code>for(hc::completion_future when_done : streams){
+<pre><code>std::vector&lt;hc::completion_future&gt; streams(n);
+for(hc::completion_future when_done : streams){
+
     when_done = hc::async_copy(payload_begin_itr,
-    payload_end_itr,
-    d_payload_itr);
+                               payload_end_itr,
+                               d_payload_view);
     when_done.then(parallel_for_each(/*do magic*/))
-             .then(hc::async_copy());
+             .then(hc::async_copy(d_payload_view,result_begin_itr));
 }
 
 hc::when_all(streams);</code></pre>
@@ -462,12 +467,12 @@ hc::when_all(streams);</code></pre>
 <ul>
 <li>AMD's ROCm/ROCr stack is a very young and ambitious project</li>
 <li>full open-source driver, runtime and compiler for dGPU</li>
-<li><code>hc</code> API is expressive and reduces boiler-plate code</li>
-<li>ecosystem and tooling are not there yet for production (HPC) codes</li>
+<li><code>hc</code> API is expressive and reduces boiler-plate code (plans for C++17 on device)</li>
+<li>tooling are not there yet for production (HPC) codes</li>
 </ul>
 <p> </p>
 <center>
-<strong>Open-source driver, runtime stack, compiler and language for GPU computing is an interesting approach to keep an eye on!</strong>
+<strong>Still an interesting approach to keep an eye on!</strong>
 </center>
 </section><section id="what-i-observe" class="slide level2">
 <h1>What I observe</h1>
@@ -475,8 +480,7 @@ hc::when_all(streams);</code></pre>
 <li>CUDA/OpenCL as the community's working horse are low-level and enforce a lot of boiler plate</li>
 <li><a href="http://thrust.github.io/">thrust</a>, <a href="https://github.com/boostorg/com">boost.compute</a>, <a href="https://www.khronos.org/sycl">sycl</a>, <a href="https://scchan.github.io/hcc/index.html">hc</a> encapsulate this<br />
 (sometimes at the expense of feature parity)</li>
-<li><a href="https://herbsutter.com/2017/03/24/trip-report-winter-iso-c-standards-meeting-kona-c17-is-complete/">C++17 parallelism extensions</a> and C++20 concurrency good for multi-core</li>
-<li>hoping for a solid parallel STL with solid vendor specific C++ interfaces</li>
+<li><a href="https://herbsutter.com/2017/03/24/trip-report-winter-iso-c-standards-meeting-kona-c17-is-complete/">C++17 parallelism extensions</a> and C++20 concurrency good for multi-core, why not for dGPUs?</li>
 </ul>
 </section><section id="my-hopes-and-acks" class="slide level2">
 <h1>My Hopes and Acks</h1>
