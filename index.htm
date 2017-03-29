@@ -166,23 +166,39 @@ Movie does not work! Sorry!
 <p><a href="http://www.amd.com/en-us/innovations/software-technologies/gcn"><img src="img/amd-gcn-2.0-hawaii_x400.png" /></a></p>
 </div>
 <div class="col-xs-8">
-</div>
 <center>
 <ul>
-<li>large memory single allocation<br />
-(&gt;32GB in one pointer)</li>
-<li>peer-to-peer Multi-GPU</li>
-<li>peer-to-peer with RDMA</li>
-<li>systems management API and tooling</li>
 <li>supported GPUs: GFX8 GPU's ( Fiji &amp; Polaris Family)</li>
 <li><p>supported CPUs:</p>
 <ul>
 <li>Intel Xeon E3/E5, Core i3/5/7 Haswell or newer</li>
 <li>(upcoming) AMD Naples/Ryzen</li>
-<li>(upcoming) Cavium Thunder X</li>
+<li>(upcoming) Cavium Thunder X ARM</li>
 </ul></li>
 </ul>
+<p> </p>
 </center>
+</div>
+</div>
+<div class="fragment">
+<div class="row">
+<div class="col-xs-4">
+<ul>
+<li>large memory single allocation<br />
+(&gt;32GB in one pointer)</li>
+</ul>
+</div>
+<div class="col-xs-4">
+<ul>
+<li>peer-to-peer Multi-GPU, RDMA</li>
+</ul>
+</div>
+<div class="col-xs-4">
+<ul>
+<li>systems management API and tooling</li>
+</ul>
+</div>
+</div>
 </div>
 </section><section id="rocr-runtime" class="slide level2">
 <h1>ROCr runtime</h1>
@@ -213,18 +229,18 @@ Movie does not work! Sorry!
 </center>
 </div>
 <div class="col-xs-8">
-</div>
 <ul>
 <li><a href="https://github.com/RadeonOpenCompute/hcc">hcc</a> compiler for supported APIs</li>
 <li>LLVM native GCN ISA code generation</li>
 <li>offline compilation support</li>
 <li>standardized loader and code object format</li>
 <li>GCN ISA assembler and disassembler</li>
-<li>HIP, HC and OpenCL programming interface</li>
+<li>OpenMP, HIP, HC and OpenCL programming interface<br />
+(OpenMP4 accelerator offloading in development)</li>
 </ul>
 </div>
-</section></section>
-<section><section id="porting-code-from-cuda" class="titleslide slide level1"><h1>Porting Code from CUDA</h1></section><section id="prologue" class="slide level2">
+</div>
+</section><section id="prologue" class="slide level2">
 <h1>Prologue</h1>
 <center>
 <figure>
@@ -246,7 +262,8 @@ OpenMP3, OpenMP4, CUDA, Kokkos, Raja, OpenCL, ...</li>
 <li>for now *nix only</li>
 </ul>
 </center>
-</section><section id="hipify" class="slide level2">
+</section></section>
+<section><section id="porting-code-from-cuda" class="titleslide slide level1"><h1>Porting Code from CUDA</h1></section><section id="hipify" class="slide level2">
 <h1>Hipify</h1>
 <div  class="row">
 <div class="col-xs-4">

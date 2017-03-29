@@ -177,23 +177,47 @@ Intel MIC
 
 [column,class="col-xs-8"]
 
-[/column]
-
 <center>
 
-- large memory single allocation   
-(>32GB in one pointer)
-- peer-to-peer Multi-GPU
-- peer-to-peer with RDMA
-- systems management API and tooling
 - supported GPUs: GFX8 GPU's ( Fiji & Polaris Family)
 - supported CPUs:
 
 	- Intel Xeon E3/E5, Core i3/5/7 Haswell or newer
 	- (upcoming) AMD Naples/Ryzen
-	- (upcoming) Cavium Thunder X
+	- (upcoming) Cavium Thunder X ARM
+
+&nbsp;
 
 </center>
+
+
+[/column]
+
+[/columns]
+
+. . . 
+
+
+[columns,class="row"]
+
+[column,class="col-xs-4"]
+
+- large memory single allocation   
+(>32GB in one pointer)
+
+[/column]
+
+[column,class="col-xs-4"]
+
+- peer-to-peer Multi-GPU, RDMA
+
+[/column]
+
+[column,class="col-xs-4"]
+
+- systems management API and tooling
+
+[/column]
 
 [/columns]
 
@@ -240,19 +264,19 @@ Intel MIC
 
 [column,class="col-xs-8"]
 
-[/column]
 
 - [hcc](https://github.com/RadeonOpenCompute/hcc) compiler for supported APIs
 - LLVM native GCN ISA code generation
 - offline compilation support
 - standardized loader and code object format
 - GCN ISA assembler and disassembler
-- HIP, HC and OpenCL programming interface
+- OpenMP, HIP, HC and OpenCL programming interface   
+(OpenMP4 accelerator offloading in development)
+
+
+[/column]
 
 [/columns]
-
-
-# Porting Code from CUDA
 
 
 ## Prologue
@@ -282,6 +306,12 @@ Intel MIC
 - for now *nix only
 
 </center>
+
+
+
+# Porting Code from CUDA
+
+
 
 ## Hipify
 
