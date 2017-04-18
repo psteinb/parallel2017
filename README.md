@@ -4,7 +4,7 @@ This is my repository for slides and code examples for my Parallel2017 talk, Mar
 
 # Slides
 
-The slides can be viewed under [this URL](https://scionics.de) or locally by opening index.html with a browser of your choice (chrome/chromium and firefox give the best results).
+The slides can be viewed under [this URL](https://psteinb.github.io/parallel2017) or locally by opening index.html with a browser of your choice (chrome/chromium and firefox give the best results).
 
 # Dependencies
 
