@@ -76,6 +76,7 @@ ggsave("gpu_stream_lim_add.svg",lim_add_plot,height=3.5)
 lim_add_plot = lim_add_plot + theme_bw()
 ggsave("gpu_stream_lim_add_bw.png",lim_add_plot,height=3.5)
 ggsave("gpu_stream_lim_add_bw.svg",lim_add_plot,height=3.5)
+ggsave("gpu_stream_lim_add_bw.pdf",lim_add_plot,height=3.5)
 
 
 lim_add_wp100_plot = ggplot( add_with_cuda ,aes(total_volume_gb ,bw_mb_per_sec/1024.,color=api,linetype=model)) #+ theme_bw()
@@ -91,6 +92,7 @@ ggsave("gpu_stream_lim_add_with_nvidia.svg",lim_add_wp100_plot,height=3.5)
 ggsave("gpu_stream_lim_add_with_nvidia.pdf",lim_add_wp100_plot,height=3.5)
 
 lim_add_wp100_plot = lim_add_wp100_plot + theme_bw()
+lim_add_wp100_plot = lim_add_wp100_plot + xlab("Benutzter GPU-Speicher pro Array / GB") + ylab(" mittlere Bandbreite / GB/s")
 ggsave("gpu_stream_lim_add_with_nvidia_bw.png",lim_add_wp100_plot,height=3.5)
 ggsave("gpu_stream_lim_add_with_nvidia_bw.svg",lim_add_wp100_plot,height=3.5)
 ggsave("gpu_stream_lim_add_with_nvidia_bw.pdf",lim_add_wp100_plot,height=3.5)
