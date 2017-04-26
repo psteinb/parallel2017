@@ -61,6 +61,7 @@ ggsave("gpu_stream_add.png",add_plot,height=3.5)
 ggsave("gpu_stream_add.svg",add_plot,height=3.5)
 
 
+
 lim_add_plot = ggplot( adddf ,aes(total_volume_gb ,bw_mb_per_sec/1024.,color=api)) #+ theme_bw()
 lim_add_plot = lim_add_plot + geom_line(size=2) #+ facet_wrap( ~ sizeof )
 lim_add_plot = lim_add_plot + ggtitle("GPU-Stream Add on AMD R9 Fiji Nano")
@@ -71,6 +72,10 @@ lim_add_plot = lim_add_plot + theme_solarized_2(light = FALSE) +
 
 ggsave("gpu_stream_lim_add.png",lim_add_plot,height=3.5)
 ggsave("gpu_stream_lim_add.svg",lim_add_plot,height=3.5)
+
+lim_add_plot = lim_add_plot + theme_bw()
+ggsave("gpu_stream_lim_add_bw.png",lim_add_plot,height=3.5)
+ggsave("gpu_stream_lim_add_bw.svg",lim_add_plot,height=3.5)
 
 
 lim_add_wp100_plot = ggplot( add_with_cuda ,aes(total_volume_gb ,bw_mb_per_sec/1024.,color=api,linetype=model)) #+ theme_bw()
@@ -83,3 +88,9 @@ lim_add_wp100_plot = lim_add_wp100_plot + theme_solarized_2(light = FALSE) +
 
 ggsave("gpu_stream_lim_add_with_nvidia.png",lim_add_wp100_plot,height=3.5)
 ggsave("gpu_stream_lim_add_with_nvidia.svg",lim_add_wp100_plot,height=3.5)
+ggsave("gpu_stream_lim_add_with_nvidia.pdf",lim_add_wp100_plot,height=3.5)
+
+lim_add_wp100_plot = lim_add_wp100_plot + theme_bw()
+ggsave("gpu_stream_lim_add_with_nvidia_bw.png",lim_add_wp100_plot,height=3.5)
+ggsave("gpu_stream_lim_add_with_nvidia_bw.svg",lim_add_wp100_plot,height=3.5)
+ggsave("gpu_stream_lim_add_with_nvidia_bw.pdf",lim_add_wp100_plot,height=3.5)
