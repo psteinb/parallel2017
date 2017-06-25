@@ -2,7 +2,7 @@
 
 ROCm und ROCr als Alternative zu CUDA
 
-ROC Me AMD! 
+House of ROC! 
 
 Peter Steinbach 
 
@@ -78,7 +78,7 @@ Intels Xeon-E3 und -E5-Chips der Haswell-Generation
 oder neuer, sowie alle Core i3/i5/i7 Chips der
 dritten Generation und aufwärts. In kommenden
 Versionen der ROCm-Plattform gehören zusätzlich
-AMDs hauseigene Naples- und Ryzen-Architekturen
+AMDs hauseigene Epyc- und Ryzen-Architekturen, OpenPower-CPUs 
 und Caviums Thunder X ARM-Chipsatz zu den
 unterstützten Plattformen. ROCm arbeitet zum
 Zeitpunkt der Fertigstellung des Artikels mit AMDs
@@ -95,9 +95,9 @@ ersten Tests scheint es sich um ein Bugfix-Release
 zu handeln, das neue Features in begrenztem Maße
 mitbringt. Eine Neuerung ist, dass es mit OpenCL
 2.0 arbeiten kann [--] abgesehen von Pipes and
-[i]DeviceEnqueue[/i] unterstützt. ROCm 1.5.1 soll
+[i]DeviceEnqueue[/i]. ROCm 1.5.1 soll
 zeitnah mit Unterstützung von ARM- und
-Power-Architekturen verfügbar sein. Man darf also
+OpenPower-Architekturen verfügbar sein. Man darf also
 gespannt bleiben, welche Performance ROCm auf API
 und auf Hardware-Niveau weiterhin bieten kann.
 
@@ -133,10 +133,7 @@ GCN-ISA-Instruktionen, die auf der GPU ausgeführt
 werden. Die ROCm bietet auch hierfür Werkzeuge zur
 weiteren Erforschung des Codes (Assembler,
 Disassembler) und ein offenes Code-Objekt-Format
-("hsaco").
-
-((kannst du eventuell kurz die GCN-ISA-Architektur
-mit einem Satz erklären))
+("hsaco"). Die Beschreibung der GCN-ISA-Spezifikation können Interessierte unter diesen [Link](http://gpuopen.com/compute-product/amd-gcn3-isa-architecture-manual/) einsehen.
 
 Für erfahrene GPU-Programmierer liefern OpenCL und
 OpenMP Standardansätze zur Beschreibung von
@@ -173,7 +170,7 @@ HPC-Speicherbandbreiten-Benchmark STREAM von John
 McAlpin auf. BabelStream implementiert die vier
 Vektor-Operationen
 ([i]copy[/i], [i]multiply[/i], [i]add[/i]
-und [i]triad[/i]) sowie das Skalarprodukt (dot):
+und [i]triad[/i]) sowie das Skalarprodukt ([i]dot[/i]):
 
 c[:]    = a[:]               /* copy  */
 b[:]    = scalar*b[:]        /* mul   */
@@ -203,16 +200,7 @@ void CUDAStream<T>::add(){
   check_error();  //..
   }
 
-Wie das Listing zeigt, templatisiert BabelStream
-
-((gibt es ein schöneres Wort für templatisiert 
-„wandelt in Tepmlates um??))
-
-alle Benchmark-Instanzen, um den benutzten
-Datentyp von einfachgenauen zu doppeltgenauen
-Fließkommazahlen ohne zusätzlichen Code
-auszutauschen. Die achte Zeile
-([i]add_kernel[/i])zeigt den Aufruf des
+Wie das Listing zeigt, bildet BabelStream den Gleitkomma-Datentyp des Benchmarks als Template ab, um die Genauigkeit ohne zusaÃ¤tzlichen Code wechseln zu können. Die achte Zeile ([i]add_kernel[/i])zeigt den Aufruf des
 Device-Kernel in vereinfachter Form. Die drei
 Zeiger [i]d_a[/i], [i]d_b[/i], [i]d_c[/i] sind
 dabei allozierte Felder auf der GPU mit der
@@ -289,7 +277,7 @@ C++14 zu benutzen. Die Struktur der API ist
 von [i]thrust[/i], [i]boost.compute[/i] oder [i]sycl[/i].
 
 ((abb.1))
-((Bitte noch BU einfügen))
+((Typisches Abstraktionsschema der C++-API und Klassenstruktur zur AusfÃ¼hrung von hoch-parallelen Berechnungen auf diskreten Grafikkarten.))
 
 Das Diagramm zeigt die Abbildung der Host-seitigen
 Strukturen durch Container, Algorithmen und
@@ -327,7 +315,7 @@ void HCStream<T>::add()
                                   });
 }
 
-Die bereits allokierten Speicherbereiche auf der
+Die bereits allozierten Speicherbereiche auf der
 GPU [i]d_a[/i], [i]d_b[/i] und [i]d_c[/i] repräsentieren
 in der HCStream-Klasse Instanzen vom
 Typ [i]hc::array[/i]. Zur vereinfachten Handhabung
@@ -341,12 +329,7 @@ Funktion [i]hc::parallel_for_each[/i] besitzt
 zsätzlich zur Funktionsweise eine Definition des
 zu bearbeitenden Indexraums. In diesem Fall ist
 es ein eindimensionaler Index im rechtsoffenen
-Intervall [i][0,array_size][/i], 
-
-((hier hattes du eine runde geschlossene Klammer,
-aber ich vermute, dass sie eckig sein soll - sonst
-korrieger mich bitte, falls die runde das rechtsoffene
-repräsentiert!!))
+Intervall [i][0,array_size)[/i], 
 
 dessen Dimensionalität zur Compile-Zeit
 feststehen muss. Dementsprechend muss die Signatur
@@ -364,7 +347,7 @@ Implementierungen aller drei Programmierparadigmen
 auf der ROCm von einer gemeinsamen
 Compiler-Infrastruktur profitieren. 
 
-((Abb.2))((Bitte noch BU einfügen))
+((Abb.2))((Vergleich der Speicher-Bandbreiten des BabelStream-Add-Kernels fÃ¼r verschiedene FeldgrÃ¶ÃŸen, GPU-Hardware und Sprachparadigmen.))
 
 Die Benchmarks mittels hc, HIP und OpenCL liegen
 über das gesamte Spektrum von Feldgrößen gleichauf
@@ -392,8 +375,6 @@ zurück. Damit wären auch Konstrukte für Daten- und
 Aufgabenabhängigkeiten denkbar, die der für
 C++2020 angedachten Concurrency TS (Technical
 Specification) ähnlich sind:
-
-((ist das nicht eher C++21?? ))
 
 std::vector<float> payload (/*pick a number if not 42*/);
 hc::array<float,1> d_payload(payload.size());
@@ -435,10 +416,6 @@ Laufzeitumgebung kann somit die Operationen derart
 auszuführen, dass sie maximale Bandbreite und
 minimale Latenz erreicht.
 
-((hab vor Latenz "maximal" durch "minimal" ersetzt
-- oder sollte die tatsächlich maximal sein?? Dann
-bitte zurückkorrigieren!))
-
 Der Schritt [i]hc::when_all(streams)[/i] dient als
 Synchronisationsbarriere. 
 
@@ -459,13 +436,12 @@ unterschiedliche Algorithmen der parallelen STL in
 C++17 auch auf die GPU zu bringen.
 
 Es lohnt sich, das ROCm-Projekt im Blick zu
-behalten, auch wenn in Version 1.4 die elementaren
-Dinge wie die Dokumentation und bei den Werkzeugen
-der Profiler und Debugger noch nicht reif genug
+behalten, auch wenn in der aktuellen Version 1.5 die elementaren
+Dinge wie die Dokumentation, der Profiler und der Debugger noch nicht reif genug
 für den Projekteinsatz sind. Die
 ROCm-Infrastruktur und die AMD-Hardware scheinen
 aber in den Startlöchern zu stehen, um eine
-Aufholjagd mit CUDA zu bestreiten.
+Aufholjagd mit CUDA und Nvidia zu bestreiten. Die Ende Juni erscheinende Deep-Learning-Bibliothek MIOpen sowie das Erscheinen der neuen Vega-Familie von AMD-Grafikkarten zur SIGGRAPH 2017, sind ein weiteres klares Indiz dafÃ¼r.
 
 Peter Steinbach 
 
