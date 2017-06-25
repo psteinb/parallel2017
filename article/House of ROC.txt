@@ -1,0 +1,481 @@
+<iso> 
+
+ROCm und ROCr als Alternative zu CUDA
+
+ROC Me AMD! 
+
+Peter Steinbach 
+
+Mit ROCr und ROCm möchte AMD den Platzhirsch
+Nvidia und dessen CUDA herausfordern. Die Ansätze
+sind vielversprechend, aber an einigen Stellen
+muss das Unternehmen noch nacharbeiten. 
+
+Peter Steinbach
+
+Die Programmierung von Grafikkarten (GPU) für
+wissenschaftliches Rechnen findet vorrangig in C++
+und Fortran (sowie teilweise in C) statt. Der
+Primus in diesem Feld ist Nvidias CUDA und das
+dazu gehörige Software-Ökosystem aus performanten
+und spezialisierten C-Bibliotheken (z.[ ]B.
+[i]cuFFT[/i], [i]cuBLAS[/i], [i]cuRAND[/i], [i]cuDNN[/i]
+und [i]cuSPARSE[/i]), einer C-Laufzeitumgebung wie
+[i]libcuda[/i] oder [i]libcudart[/i],
+C++-Abstraktionen ([i]thrust[/i] und [i]cub[/i])
+sowie aus Entwicklungswerkzeugen wie dem
+Debugger [i]cuda-gdb[/i] oder der Profiling-Suite
+NVVP. Entwickler erhalten in Verbindung mit einem
+breiten Spektrum an meist frei zugänglichen
+Lernressourcen wie Webinaren oder Onlinekursen
+einen vergleichsweise komfortablen Einstieg in die
+Programmierung von Nvidia GPUs. Davon verspricht
+sich Big Green nicht nur eine Beschleunigung der
+Anwendung, sondern auch höhere Verkaufszahlen der
+Hardware, denn CUDA-Applikationen
+und -Bibliotheken sind ausschließlich auf
+Nvidia-Hardware lauffähig.
+
+Die offen standardisierte Alternative OpenCL
+fristet leider seit Jahren außerhalb akademischer
+Projekte ein Schattendasein. Trotz mehrerer
+Anstrengungen einer Renaissance (OpenCL 2.1 im
+Jahr 2015, OpenCL 2.2 im Jahr 2016) und der
+semantischen Nähe zu CUDA hat dieses Paradigma
+nicht die flächendeckende Anwendung aufzuweisen
+wie Nvidias Plattform. Gründe dafür sind unter
+anderem ein fehlendes einheitliches
+Software-Ökosystem für GPU- und CPU-basierte
+Plattformen, wirtschaftliche Interessen der
+Hersteller, die hauseigene Technologien den Vorzug
+geben, die schiere Hardware-Komplexität im
+Wechselspiel zum Low-level-Charakter von OpenCL
+sowie die heterogenen Möglichkeiten der
+Kompilation von OpenCL-Kernels.
+
+Gegenangriff von AMD
+
+Aus dieser Situation heraus hat AMD in den
+vergangenen Monaten eine Open-Source-Plattform zum
+Ausführen, Analysieren und Kompilieren von
+Software auf AMD-GPU-Hardware geschaffen.
+Innerhalb der AMD-Initiative Radeon Open Compute
+(ROC) ist ein vollständiges und reichhaltiges
+Ökosystem aus Treibern, Laufzeitumgebungen,
+Compiler-Infrastruktur und Analysewerkzeugen unter
+dem Namen ROCm (Radeon Open Compute Platform)
+entstanden. Als Betriebssystem unterstützt das
+Projekt aktuell exklusiv Linux, da der Fokus auf
+dem serverbasierten Cloud-, Deep-Learning- und
+HPC-Markt liegt.
+
+Das Herzstück der ROCm bildet
+der Kernel-Treiber ROCk, den AMD-spezifische
+Paketquellen im laufenden Betrieb installieren und
+dessen Aktivierung beim Reboot stattfindet. Diese
+Kernel-Erweiterung unterstützten auf der Hostseite
+Intels Xeon-E3 und -E5-Chips der Haswell-Generation
+oder neuer, sowie alle Core i3/i5/i7 Chips der
+dritten Generation und aufwärts. In kommenden
+Versionen der ROCm-Plattform gehören zusätzlich
+AMDs hauseigene Naples- und Ryzen-Architekturen
+und Caviums Thunder X ARM-Chipsatz zu den
+unterstützten Plattformen. ROCm arbeitet zum
+Zeitpunkt der Fertigstellung des Artikels mit AMDs
+Fiji und Polaris-GPU-Karten zusammen, also der
+dritten und vierten Generation der GCN-Architektur
+(Graphics Core Next). Das Treibermodul unterstützt
+außerdem den Multi-GPU-Betrieb sowie Remote Direct
+Memory Access (RDMA) und exportiert zusätzlich
+eine Systemmanagement-API, um beispielsweise
+Monitoring-Werkzeuge anzubinden.
+
+Seit Anfang Mai 2017 ist ROCm 1.5 verfügbar. Nach
+ersten Tests scheint es sich um ein Bugfix-Release
+zu handeln, das neue Features in begrenztem Maße
+mitbringt. Eine Neuerung ist, dass es mit OpenCL
+2.0 arbeiten kann [--] abgesehen von Pipes and
+[i]DeviceEnqueue[/i] unterstützt. ROCm 1.5.1 soll
+zeitnah mit Unterstützung von ARM- und
+Power-Architekturen verfügbar sein. Man darf also
+gespannt bleiben, welche Performance ROCm auf API
+und auf Hardware-Niveau weiterhin bieten kann.
+
+Laufzeitumgebung ROCr
+
+Auf der Kernel-Infrastruktur baut
+die ROCr-Laufzeitumgebung auf. Sie implementiert
+nicht nur die Laufzeitspezifikation der
+HSA-Foundation (Heterogeneous System
+Architecture), sondern enthält diverse Zusätze für
+den Multi-GPU-Betrieb [--] gerade für
+Deep-Learning-Anwendungen und anspruchsvolle
+Simulationen ein wichtiges Feature. Des Weiteren
+bieten die Macher APIs zur "Device Discovery",
+Nebenläufigkeit von CPU- und GPU-Prozessen und
+GPU-Multitasking, atomare Speichertransaktionen
+und Signale sowie User-Space-Warteschlangen und
+flache Speicheradressierung an.
+
+Entwickler interagieren mit der ROCm-Plattform
+hauptsächlich über den mitgelieferten
+Compiler [i]hcc[/i] (Heterogenous Compute
+Compiler). Er basiert auf der
+LLVM/Clang-Compiler-Infrastruktur und bietet
+Frontends zur Verarbeitung von Quelltext in
+OpenCL, HIP und HC, auf die der Artikel später
+genauer eingehen wird, sowie künftig OpenMP4 zur
+Programmierung der GPU. Der OpenCL-Support ist
+erst kürzlich und auf Drängen der Community in
+ROCm-Version 1.4 hinzugekommen. Im Backend
+generiert der Compiler native
+GCN-ISA-Instruktionen, die auf der GPU ausgeführt
+werden. Die ROCm bietet auch hierfür Werkzeuge zur
+weiteren Erforschung des Codes (Assembler,
+Disassembler) und ein offenes Code-Objekt-Format
+("hsaco").
+
+((kannst du eventuell kurz die GCN-ISA-Architektur
+mit einem Satz erklären))
+
+Für erfahrene GPU-Programmierer liefern OpenCL und
+OpenMP Standardansätze zur Beschreibung von
+Parallelität auf Multi- und
+Many-Core-Architekturen abseits von CUDA.
+Heterogeneous-compute Interface for Portability
+(HIP) und HC sind jedoch Eigenentwicklungen aus
+dem Haus AMD. HIP ist eine CUDA-nahe Sprache und
+soll Entwicklern [--] gegebenenfalls mithilfe
+dedizierter Werkzeuge [--] die Überführung von
+CUDA-Anwendungen und -Bibliotheken in eine auf
+AMD- und Nvidia-Hardware lauffähige Form
+erleichtern. HIP selbst bietet C++ in
+Kernel-Konstrukten an und kennt C++11, C++14 und
+teilweise C++17. Die Laufzeitprogrammierung auf
+der CPU geschieht wie bei CUDA über eine C-API,
+die ebenso in C++ nutzbar ist. HIP unterstützt die
+meist genutzten CUDA-Features wie
+Speichermanagement auf dem Device, Streams zur
+Verwaltung von CPU-GPU-Nebenläufigkeit inklusive
+Ereignissen zur Synchronisation sowie die
+Profiling-API. Die HIP-Kompilate erfreuen sich
+einer hundertprozentigen Tool-Unterstützung aller
+Profiler und Debugger aus dem CUDA- wie dem dem
+ROCm-Universum.
+
+Benchmark zum Vergleich
+
+Zur Illustration der weiteren Ausführungen soll 
+der quelloffene BabelStream-Benchmark der
+Universität Bristol dienen. Er nutzt C++11 und
+baut auf dem klassischen
+HPC-Speicherbandbreiten-Benchmark STREAM von John
+McAlpin auf. BabelStream implementiert die vier
+Vektor-Operationen
+([i]copy[/i], [i]multiply[/i], [i]add[/i]
+und [i]triad[/i]) sowie das Skalarprodukt (dot):
+
+c[:]    = a[:]               /* copy  */
+b[:]    = scalar*b[:]        /* mul   */
+c[:]    = a[:] + b[:]        /* add   */
+a[:]    = b[:] + scalar*c[:] /* triad */
+scalar  = dot(a[:],b[:])     /* dot   */
+
+Der Benchmark führt diese Operationen wiederholt
+auf synthetisch gefüllten Feldern aus, deren Größe
+durch die Nutzer konfigurierbar ist. Die Messung
+der Laufzeit der Operationen zeigt nicht nur die
+Werte der Speicherbandbreite auf der GPU, sondern
+auch der Effizienz eines Programmierparadigmas und
+der benutzten Compiler-Infrastruktur.
+
+Der [i]add[/i]-Kernel in der CUDA-Implementierung
+sieht folgendermaßen aus:
+
+__global__ void add_kernel(const T * a,
+                           const T * b,
+                           T * c){
+  const int i = blockDim.x * blockIdx.x + threadIdx.x;
+  c[i] = a[i] + b[i];}
+
+void CUDAStream<T>::add(){
+  add_kernel<<<array_size/TBSIZE, TBSIZE>>>(d_a, d_b, d_c);
+  check_error();  //..
+  }
+
+Wie das Listing zeigt, templatisiert BabelStream
+
+((gibt es ein schöneres Wort für templatisiert 
+„wandelt in Tepmlates um??))
+
+alle Benchmark-Instanzen, um den benutzten
+Datentyp von einfachgenauen zu doppeltgenauen
+Fließkommazahlen ohne zusätzlichen Code
+auszutauschen. Die achte Zeile
+([i]add_kernel[/i])zeigt den Aufruf des
+Device-Kernel in vereinfachter Form. Die drei
+Zeiger [i]d_a[/i], [i]d_b[/i], [i]d_c[/i] sind
+dabei allozierte Felder auf der GPU mit der
+Anzahl [i]array_size[/i] an Elementen. CUDA
+verlangt für jeden Kernel-Aufruf eine doppelte,
+virtuelle Partitionierung des Indexraumes aller zu
+bearbeitenden Elemente. In diesem Fall ist der
+Indexraum eindimensional, der
+in [i]array_size/TBSIZE[/i] Blöcke
+und [i]TBSIZE[/i] Threads pro Block zerlegt wird
+-- beides sind ganzzahlige Skalare. Diese Notation
+umgeht das explizite Angeben einer
+[i]for[/i]-Schleife über den Indexraum. Es
+erzwingt aber das manuelle Zusammensetzen des
+Index, wie in der vierten Zeile zu sehen ist.
+Dabei
+sind [i]blockDim[/i], [i]blockIdx[/i] und [i]threadIdx[/i] C-Strukturen,
+die die CUDA-Laufzeit-API zur Verfügung stellt.
+
+HIP-pe Übersetzung
+
+Die Übersetzung des obigen Listings mit dem
+Kommandozeilenwerkzeug hipify der ROCm-Plattform
+erzeugt folgenden HIP-Code:
+
+((stimmt das so? Hatte ich leicht umformuliert, um
+den direkten Übergang zu schaffen))
+
+__global__ void add_kernel(hipLaunchParm lp,
+                           const T * a, const T * b,
+                           T * c){
+  const int i = hipBlockDim_x * hipBlockIdx_x + hipThreadIdx_x;
+  c[i] = a[i] + b[i];
+}
+
+void HIPStream<T>::add(){
+  hipLaunchKernel(HIP_KERNEL_NAME(add_kernel),
+                  dim3(array_size/TBSIZE), dim3(TBSIZE), 0, 0,
+                  d_a, d_b, d_c);  check_error();  //...
+}
+
+Das Listing ist strukturell identisch zu dem
+vorherigen. Das Tool hat die Laufzeit-Structs
+umbenannt
+([i]hipBlockDim_x[/i], [i]hipBlockIdx_x[/i], [i]hipThreadIdx_x[/i]).
+Den Aufruf und die Signatur des Kernel hat es
+durch HIP-spezifische Boilerplate-Argumente
+ergänzt, um eine vergleichbare Funktionsweise zu
+CUDA zu erreichen und dennoch Code zu generieren,
+den [i]nvcc[i] und [i]hcc[i] verarbeiten können.
+
+HIP ist damit ein interessantes und ernst zu
+nehmendes Werkzeug zur Konvertierung von
+Legacy-CUDA-Anwendungen und sollte AMD
+ermöglichen, schnell auf AMD-GPUs lauffähige
+Projekte vorzeigen zu können. HIP-Code kann zudem
+mit einem Ökosystem spezialisierter Bibliotheken
+wie [i]hipBlas[/i], [i]hipFFT[/i] und
+[i]hipRNG[/i] interagieren.
+
+Nutzung in C++
+
+Einen etwas innovativeren Anstrich hat die
+C++-API [i]hc[/i], mit der Laufzeit- und
+Device-Kernel-Umgebung in C++ benutzbar sind. Der
+Kern der Sprache basiert auf dem offenen
+C++AMP-1.2-Standard innerhalb
+des [i]hc[/i]-Namensraumes. Dazu gibt es
+beispielsweise Erweiterungen für den asynchronen
+Memory-Transfer im selben Namensraum und die
+Option, in Host- und Device-seitigem Quelltext
+C++14 zu benutzen. Die Struktur der API ist
+ähnlich der
+von [i]thrust[/i], [i]boost.compute[/i] oder [i]sycl[/i].
+
+((abb.1))
+((Bitte noch BU einfügen))
+
+Das Diagramm zeigt die Abbildung der Host-seitigen
+Strukturen durch Container, Algorithmen und
+Funktionen der C++-Sprachen und
+-Standardbibliothek. Darüber hinaus existiert eine
+API zur Arbeit mit GPU-Speicherbereichen
+([i]hc::array[/i] und [i]hc::array_view[/i]), zum
+Transfer von Daten von und zur GPU
+([i]hc::copy[/i], [i]hc::async_copy[/i]) sowie
+Funktionen zum Durchführen von Berechnungen und
+anderen Operationen auf dem Device
+([i]hc::parallel_for_each[/i]). Im Gegensatz zu
+aktuellen Low-level GPU-Sprachen wie CUDA,
+verzichtet sie vollständig auf eine Kernel-Syntax
+beziehungsweise das Grid-Threadblock-Dispatchment.
+Optimierungen, die die Ausführung
+von [i]hc::parallel_for_each[/i] auf der Hardware
+zur Laufzeit betreffen, führt der Compiler
+beziehungsweise die Laufzeitumgebung durch.
+
+In Anlehnung an obigen BabelStream-Code in CUDA
+gestaltet sich die Implementierung des Add-Kernel
+in hc folgendermaßen:
+
+template <class T>
+void HCStream<T>::add()
+{
+    hc::array_view<T,1> view_a(this->d_a);
+    hc::array_view<T,1> view_b(this->d_b);
+    hc::array_view<T,1> view_c(this->d_c);
+
+    hc::parallel_for_each(hc::extent<1>(array_size)
+                                , [=](hc::index<1> i) [[hc]] {
+                                  view_c[i] = view_a[i]+view_b[i];
+                                  });
+}
+
+Die bereits allokierten Speicherbereiche auf der
+GPU [i]d_a[/i], [i]d_b[/i] und [i]d_c[/i] repräsentieren
+in der HCStream-Klasse Instanzen vom
+Typ [i]hc::array[/i]. Zur vereinfachten Handhabung
+im folgenden Lambda-Aufruf werden Referenzen auf
+diese Felder in Objekte vom
+Typ [i]hc::array_view[/i] gekapselt. Das
+ermöglicht die By-Value-Übergabe an die
+Lambda-Funktion (hier zu rein illustrativen
+Zwecken benutzt). Die
+Funktion [i]hc::parallel_for_each[/i] besitzt
+zsätzlich zur Funktionsweise eine Definition des
+zu bearbeitenden Indexraums. In diesem Fall ist
+es ein eindimensionaler Index im rechtsoffenen
+Intervall [i][0,array_size][/i], 
+
+((hier hattes du eine runde geschlossene Klammer,
+aber ich vermute, dass sie eckig sein soll - sonst
+korrieger mich bitte, falls die runde das rechtsoffene
+repräsentiert!!))
+
+dessen Dimensionalität zur Compile-Zeit
+feststehen muss. Dementsprechend muss die Signatur
+der Lambda-Funktion ebenfalls dieser
+Dimensionalität folgen und nimmt ein von der
+Laufzeitbibliothek zur Verfügung
+gestelltes [i]hc::index<1>[/i]-Objekt als
+Parameter, das letztlich nur dazu dient, die
+Operationen auf den
+GPU-Feldern [i]d_a[/i], [i]d_b[/i] und [i]d_c[/i] zu
+platzieren.
+
+Die folgende Abbildung zeigt, mit welcher Güte die
+Implementierungen aller drei Programmierparadigmen
+auf der ROCm von einer gemeinsamen
+Compiler-Infrastruktur profitieren. 
+
+((Abb.2))((Bitte noch BU einfügen))
+
+Die Benchmarks mittels hc, HIP und OpenCL liegen
+über das gesamte Spektrum von Feldgrößen gleichauf
+[--] abgesehen von stochastischen Schwankungen.
+Ein beeindruckender Fakt nebenbei: Die
+Speicherbrandbreite einer Fiji R9 Nano
+(veröffentlicht 2015) ist doppelt so hoch wie die
+einer Nvidia GeForce GTX 1080 (veröffentlicht
+2016). Der Grund hierfür liegt in der
+Speicherarchitektur: Die AMD-Karte benutzt High
+Bandwidth Memory der ersten Generation, während
+die Nvidia-Karte GDDR5 DRAM benutzt. Recht
+deutlich fällt der Vorsprung einer Nvidia Tesla
+P100 durch ihren High Bandwidth Memory der zweiten
+Generation gegenüber der Fiji Nano und der
+GeForce-Karte aus.
+
+Zuletzt bekommt noch ein kleines Juwel in
+der [i]hc[/i]-API seinen Auftritt, das eine
+besondere Erwähnung verdient: Die
+Funktionen [i]hc::parallel_for_each[/i] und
+[i]hc::async_copy[/i] geben als Rückgabewert ein
+Objekt vom Typ [i]hc::completion_future[/i] 
+zurück. Damit wären auch Konstrukte für Daten- und
+Aufgabenabhängigkeiten denkbar, die der für
+C++2020 angedachten Concurrency TS (Technical
+Specification) ähnlich sind:
+
+((ist das nicht eher C++21?? ))
+
+std::vector<float> payload (/*pick a number if not 42*/);
+hc::array<float,1> d_payload(payload.size());
+
+hc::completion_future when_done = hc::async_copy(payload.begin(),
+                                                 payload.end(),
+                                                 d_payload);
+when_done.then(call_kernel_functor); //continuation function!
+
+Das eröffnet aus technischer Sicht viele
+Möglichkeiten, um asynchrone Operationen im
+Wechselspiel CPU-GPU (Task-Parallelität) zu
+implementieren und damit die Fähigkeiten einer
+heterogenen Hardware des 21. Jahrhunderts in
+vielen Szenarien mit minimalem Code auszureizen.
+Damit wären auch Konstrukte zum Ausdruck von
+Daten- sowie Aufgabenabhängigkeiten ähnliche der
+Concurrency TS denkbar. 
+
+
+
+std::vector<hc::completion_future> streams(n);
+for(hc::completion_future when_done : streams){
+
+    when_done = hc::async_copy(payload_begin_itr,
+                               payload_end_itr,
+                               d_payload_view);
+    when_done.then(parallel_for_each(/*do magic*/))
+             .then(hc::async_copy(d_payload_view,result_begin_itr));
+}
+
+hc::when_all(streams);
+
+In dem Pseudo-Code sind
+[i]n[/i] Berechnungsschritte inklusive
+Datentransfer zu und von der GPU an
+ein [i]completion_future[/i] gebunden. Die
+Laufzeitumgebung kann somit die Operationen derart
+auszuführen, dass sie maximale Bandbreite und
+minimale Latenz erreicht.
+
+((hab vor Latenz "maximal" durch "minimal" ersetzt
+- oder sollte die tatsächlich maximal sein?? Dann
+bitte zurückkorrigieren!))
+
+Der Schritt [i]hc::when_all(streams)[/i] dient als
+Synchronisationsbarriere. 
+
+Fazit
+
+Zusammenfassend lässt sich feststellen, dass die
+ROCm-Plattform ein junges und ambitioniertes
+Projekt ist. Der Software-Stack aus dem Haus AMD
+baut über das gesamte Gerüst auf Open Source:
+Kernel-Treiber, Laufzeitumgebung, Compiler,
+Bibliotheken. hc kann zu einer ausdrucksstarken
+Sprache avancieren, die den Boiler-Plate-Anteil des
+Quelltextes in realen Projekten drastisch reduziert.
+Es wird sich zeigen, wie stabil die hc-API ist und
+inwiefern sie sich neben C++17 für
+Device-Operationen behaupten kann. AMD plant
+unterschiedliche Algorithmen der parallelen STL in
+C++17 auch auf die GPU zu bringen.
+
+Es lohnt sich, das ROCm-Projekt im Blick zu
+behalten, auch wenn in Version 1.4 die elementaren
+Dinge wie die Dokumentation und bei den Werkzeugen
+der Profiler und Debugger noch nicht reif genug
+für den Projekteinsatz sind. Die
+ROCm-Infrastruktur und die AMD-Hardware scheinen
+aber in den Startlöchern zu stehen, um eine
+Aufholjagd mit CUDA zu bestreiten.
+
+Peter Steinbach 
+
+ist Scientific Software Engineer bei Scionics
+Computer Innovation GmbH in Dresden und arbeitet
+in dieser Rolle als interner Dienstleister und
+Berater für das Max-Planck Institut für molekulare
+Zellbiologie und Genetik vor allem im Bereich HPC,
+GPU-Programmierung und Performance-Engineering.
+
+Technische Unterstützung und Feedback haben
+Matthias Werner (ZiH, TU Dresden) und Robert Haase
+(Scionics) gegeben.
