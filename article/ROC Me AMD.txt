@@ -38,7 +38,7 @@ Nvidia-Hardware lauffähig.
 
 Die offen standardisierte Alternative OpenCL
 fristet leider seit Jahren außerhalb akademischer
-Projekt ein Schattendasein. Trotz mehrerer
+Projekte ein Schattendasein. Trotz mehrerer
 Anstrengungen einer Renaissance (OpenCL 2.1 im
 Jahr 2015, OpenCL 2.2 im Jahr 2016) und der
 semantischen Nähe zu CUDA hat dieses Paradigma
@@ -49,7 +49,7 @@ Software-Ökosystem für GPU- und CPU-basierte
 Plattformen, wirtschaftliche Interessen der
 Hersteller, die hauseigene Technologien den Vorzug
 geben, die schiere Hardware-Komplexität im
-Wechselspiel zum Low-level-Charakter von OpenCL,
+Wechselspiel zum Low-level-Charakter von OpenCL
 sowie die heterogenen Möglichkeiten der
 Kompilation von OpenCL-Kernels.
 
@@ -220,7 +220,7 @@ Anzahl [i]array_size[/i] an Elementen. CUDA
 verlangt für jeden Kernel-Aufruf eine doppelte,
 virtuelle Partitionierung des Indexraumes aller zu
 bearbeitenden Elemente. In diesem Fall ist der
-Indexraum eindimensional der
+Indexraum eindimensional, der
 in [i]array_size/TBSIZE[/i] Blöcke
 und [i]TBSIZE[/i] Threads pro Block zerlegt wird
 -- beides sind ganzzahlige Skalare. Diese Notation
@@ -268,10 +268,10 @@ HIP ist damit ein interessantes und ernst zu
 nehmendes Werkzeug zur Konvertierung von
 Legacy-CUDA-Anwendungen und sollte AMD
 ermöglichen, schnell auf AMD-GPUs lauffähige
-Projekte zu gewinnen. HIP-Code kann zudem mit
-einem Ökosystem spezialisierter Bibliotheken wie
-[i]hipBlas[/i], [i]hipFFT[/i] und [i]hipRNG[/i]
-interagieren.
+Projekte vorzeigen zu können. HIP-Code kann zudem
+mit einem Ökosystem spezialisierter Bibliotheken
+wie [i]hipBlas[/i], [i]hipFFT[/i] und
+[i]hipRNG[/i] interagieren.
 
 Nutzung in C++
 
@@ -310,7 +310,7 @@ von [i]hc::parallel_for_each[/i] auf der Hardware
 zur Laufzeit betreffen, führt der Compiler
 beziehungsweise die Laufzeitumgebung durch.
 
-In Anlehnung an obigen BabelStream-Code in CUDA,
+In Anlehnung an obigen BabelStream-Code in CUDA
 gestaltet sich die Implementierung des Add-Kernel
 in hc folgendermaßen:
 
@@ -389,9 +389,9 @@ Funktionen [i]hc::parallel_for_each[/i] und
 [i]hc::async_copy[/i] geben als Rückgabewert ein
 Objekt vom Typ [i]hc::completion_future[/i] 
 zurück. Damit wären auch Konstrukte für Daten- und
-Aufgabenabhängigkeiten denkbar, die ähnlich zu der
-für C++2020 angedachten Concurrency TS (Technical
-Specification) sind:
+Aufgabenabhängigkeiten denkbar, die der für
+C++2020 angedachten Concurrency TS (Technical
+Specification) ähnlich sind:
 
 ((ist das nicht eher C++21?? ))
 
@@ -469,19 +469,13 @@ Aufholjagd mit CUDA zu bestreiten.
 
 Peter Steinbach 
 
-ist Scientific Software Engineer
-bei Scionics Computer Innovation GmbH in Dresden
-und arbeitet in dieser Rolle als interner
-Dienstleister und Berater für das Max-Planck
-Institut für molekulare Zellbiologie und
-Genetik vor allem im Bereich HPC,
+ist Scientific Software Engineer bei Scionics
+Computer Innovation GmbH in Dresden und arbeitet
+in dieser Rolle als interner Dienstleister und
+Berater für das Max-Planck Institut für molekulare
+Zellbiologie und Genetik vor allem im Bereich HPC,
 GPU-Programmierung und Performance-Engineering.
-Scionics ist Mitglied im GPU Center of
-Excellence unter Schirmherrenschaft der TU
-Dresden, in dem sich lokale Institute und
-Industriepartner der effizienten Nutzung von
-Grafikkarten zum Zwecke der Visualisierung und
-performanter Berechnungen austauschen. Ich möchte
-mich bei Matthias Werner (ZiH, TU Dresden) und
-Robert Haase (Scionics) für das wertvolle Feedback
-zu diesem Artikel herzlich bedanken.
+
+Technische Unterstützung und Feedback haben
+Matthias Werner (ZiH, TU Dresden) und Robert Haase
+(Scionics) gegeben.
